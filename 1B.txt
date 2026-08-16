@@ -1,0 +1,70 @@
+import java.util.*;
+
+public class Main {
+
+    // Column number -> Excel letters
+    static String getColumnName(int col) {
+        StringBuilder sb = new StringBuilder();
+
+        while (col > 0) {
+            col--;
+            sb.append((char) ('A' + col % 26));
+            col /= 26;
+        }
+
+        return sb.reverse().toString();
+    }
+
+    // Excel letters -> Column number
+    static int getColumnNumber(String col) {
+        int result = 0;
+
+        for (int i = 0; i < col.length(); i++) {
+            result = result * 26 + (col.charAt(i) - 'A' + 1);
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        while (n-- > 0) {
+
+            String s = sc.next();
+
+            // Format: R23C55
+            if (s.matches("R[0-9]+C[0-9]+")) {
+
+                int c = s.indexOf('C');
+
+                int row = Integer.parseInt(s.substring(1, c));
+                int column = Integer.parseInt(s.substring(c + 1));
+
+                System.out.println(getColumnName(column) + row);
+
+            } 
+            // Format: BC23
+            else {
+
+                int i = 0;
+
+                while (i < s.length() && s.charAt(i) >= 'A' && s.charAt(i) <= 'Z') {
+                    i++;
+                }
+
+                String column = s.substring(0, i);
+                int row = Integer.parseInt(s.substring(i));
+
+                int columnNumber = getColumnNumber(column);
+
+                System.out.println("R" + row + "C" + columnNumber);
+            }
+        }
+
+        sc.close();
+    }
+}
