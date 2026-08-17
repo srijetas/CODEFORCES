@@ -1,0 +1,76 @@
+import java.util.*;
+
+public class Main {
+
+    static final double PI = Math.PI;
+    static final double EPS = 1e-4;
+
+    static double distance(double x1, double y1,
+                           double x2, double y2) {
+        return Math.hypot(x1 - x2, y1 - y2);
+    }
+
+    // GCD for double values
+    static double gcd(double a, double b) {
+        if (b < EPS) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        double x1 = sc.nextDouble();
+        double y1 = sc.nextDouble();
+
+        double x2 = sc.nextDouble();
+        double y2 = sc.nextDouble();
+
+        double x3 = sc.nextDouble();
+        double y3 = sc.nextDouble();
+
+        // Three sides
+        double a = distance(x1, y1, x2, y2);
+        double b = distance(x2, y2, x3, y3);
+        double c = distance(x1, y1, x3, y3);
+
+        // Triangle area using determinant
+        double triangleArea = Math.abs(
+                x1 * (y2 - y3)
+              + x2 * (y3 - y1)
+              + x3 * (y1 - y2)
+        ) / 2.0;
+
+        // Circumradius
+        double R = (a * b * c) / (4.0 * triangleArea);
+
+        /*
+         * Central angles corresponding to the 3 chords.
+         */
+        double A = Math.acos(
+                (2.0 * R * R - a * a) / (2.0 * R * R)
+        );
+
+        double B = Math.acos(
+                (2.0 * R * R - b * b) / (2.0 * R * R)
+        );
+
+        // IMPORTANT:
+        // Don't calculate C using another acos().
+        double C = 2.0 * PI - A - B;
+
+        // Smallest central angle
+        double angle = gcd(A, gcd(B, C));
+
+        // Number of sides
+        double n = 2.0 * PI / angle;
+
+        // Area of regular polygon
+        double area =
+                n * R * R * Math.sin(angle) / 2.0;
+
+        System.out.printf("%.8f%n", area);
+    }
+}
