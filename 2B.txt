@@ -1,0 +1,179 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static final int INF = 1_000_000_000;
+
+    static int n;
+
+    static int[][] twos;
+    static int[][] fives;
+
+    static int[][] solve(int[][] cost) {
+        int[][] dp = new int[n][n];
+
+        for (int[] row : dp)
+            Arrays.fill(row, INF);
+
+        dp[0][0] = cost[0][0];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+
+                if (i == 0 && j == 0)
+                    continue;
+
+                if (cost[i][j] == INF)
+                    continue;
+
+                if (i > 0) {
+                    dp[i][j] = Math.min(
+                            dp[i][j],
+                            dp[i - 1][j] + cost[i][j]
+                    );
+                }
+
+                if (j > 0) {
+                    dp[i][j] = Math.min(
+                            dp[i][j],
+                            dp[i][j - 1] + cost[i][j]
+                    );
+                }
+            }
+        }
+
+        return dp;
+    }
+
+    static String getPath(int[][] dp) {
+        StringBuilder path = new StringBuilder();
+
+        int i = n - 1;
+        int j = n - 1;
+
+        while (i > 0 || j > 0) {
+
+            if (i == 0) {
+                path.append('R');
+                j--;
+            }
+            else if (j == 0) {
+                path.append('D');
+                i--;
+            }
+            else if (dp[i - 1][j] < dp[i][j - 1]) {
+                path.append('D');
+                i--;
+            }
+            else {
+                path.append('R');
+                j--;
+            }
+        }
+
+        return path.reverse().toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        n = Integer.parseInt(br.readLine());
+
+        twos = new int[n][n];
+        fives = new int[n][n];
+
+        int zeroR = -1;
+        int zeroC = -1;
+
+        for (int i = 0; i < n; i++) {
+
+            StringTokenizer st =
+                    new StringTokenizer(br.readLine());
+
+            for (int j = 0; j < n; j++) {
+
+                int x = Integer.parseInt(st.nextToken());
+
+                if (x == 0) {
+                    zeroR = i;
+                    zeroC = j;
+
+                    twos[i][j] = INF;
+                    fives[i][j] = INF;
+
+                    continue;
+                }
+
+                int temp = x;
+                int count2 = 0;
+
+                while (temp % 2 == 0) {
+                    count2++;
+                    temp /= 2;
+                }
+
+                temp = x;
+                int count5 = 0;
+
+                while (temp % 5 == 0) {
+                    count5++;
+                    temp /= 5;
+                }
+
+                twos[i][j] = count2;
+                fives[i][j] = count5;
+            }
+        }
+
+        // Minimum number of 2s
+        int[][] dp2 = solve(twos);
+
+        // Minimum number of 5s
+        int[][] dp5 = solve(fives);
+
+        int ans2 = dp2[n - 1][n - 1];
+        int ans5 = dp5[n - 1][n - 1];
+
+        /*
+         * If there is a zero and normal answer is greater than 1,
+         * take a path through zero.
+         */
+        if (zeroR != -1 && Math.min(ans2, ans5) > 1) {
+
+            StringBuilder path = new StringBuilder();
+
+            // Move down to zero
+            for (int i = 0; i < zeroR; i++)
+                path.append('D');
+
+            // Move right to zero
+            for (int j = 0; j < zeroC; j++)
+                path.append('R');
+
+            // Move down to bottom
+            for (int i = zeroR; i < n - 1; i++)
+                path.append('D');
+
+            // Move right to bottom
+            for (int j = zeroC; j < n - 1; j++)
+                path.append('R');
+
+            System.out.println(1);
+            System.out.println(path);
+
+        }
+        else if (ans2 < ans5) {
+
+            System.out.println(ans2);
+            System.out.println(getPath(dp2));
+
+        }
+        else {
+
+            System.out.println(ans5);
+            System.out.println(getPath(dp5));
+        }
+    }
+}
