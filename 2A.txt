@@ -1,0 +1,47 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        String[] names = new String[n];
+        int[] scores = new int[n];
+
+        HashMap<String, Integer> total = new HashMap<>();
+
+        // Calculate final scores
+        for (int i = 0; i < n; i++) {
+            names[i] = sc.next();
+            scores[i] = sc.nextInt();
+
+            total.put(names[i],
+                    total.getOrDefault(names[i], 0) + scores[i]);
+        }
+
+        // Find maximum final score
+        int maxScore = Integer.MIN_VALUE;
+
+        for (int score : total.values()) {
+            maxScore = Math.max(maxScore, score);
+        }
+
+        // Find the first player who reaches maxScore
+        HashMap<String, Integer> current = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            String name = names[i];
+
+            current.put(name,
+                    current.getOrDefault(name, 0) + scores[i]);
+
+            if (current.get(name) >= maxScore &&
+                total.get(name) == maxScore) {
+
+                System.out.println(name);
+                return;
+            }
+        }
+    }
+}
