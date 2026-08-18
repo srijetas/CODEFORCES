@@ -1,0 +1,56 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String s = sc.next();
+        String t = sc.next();
+
+        int x1 = s.charAt(0) - 'a';
+        int y1 = s.charAt(1) - '1';
+
+        int x2 = t.charAt(0) - 'a';
+        int y2 = t.charAt(1) - '1';
+
+        List<String> moves = new ArrayList<>();
+
+        while (x1 != x2 || y1 != y2) {
+            if (x1 < x2 && y1 < y2) {
+                moves.add("RU");
+                x1++;
+                y1++;
+            } else if (x1 < x2 && y1 > y2) {
+                moves.add("RD");
+                x1++;
+                y1--;
+            } else if (x1 > x2 && y1 < y2) {
+                moves.add("LU");
+                x1--;
+                y1++;
+            } else if (x1 > x2 && y1 > y2) {
+                moves.add("LD");
+                x1--;
+                y1--;
+            } else if (x1 < x2) {
+                moves.add("R");
+                x1++;
+            } else if (x1 > x2) {
+                moves.add("L");
+                x1--;
+            } else if (y1 < y2) {
+                moves.add("U");
+                y1++;
+            } else {
+                moves.add("D");
+                y1--;
+            }
+        }
+
+        System.out.println(moves.size());
+
+        for (String move : moves) {
+            System.out.println(move);
+        }
+    }
+}
