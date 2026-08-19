@@ -1,0 +1,116 @@
+import java.io.*;
+
+public class Main {
+
+    static boolean win(char[][] board, char c) {
+
+        // Rows
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] == c &&
+                board[i][1] == c &&
+                board[i][2] == c) {
+                return true;
+            }
+        }
+
+        // Columns
+        for (int j = 0; j < 3; j++) {
+            if (board[0][j] == c &&
+                board[1][j] == c &&
+                board[2][j] == c) {
+                return true;
+            }
+        }
+
+        // Main diagonal
+        if (board[0][0] == c &&
+            board[1][1] == c &&
+            board[2][2] == c) {
+            return true;
+        }
+
+        // Other diagonal
+        if (board[0][2] == c &&
+            board[1][1] == c &&
+            board[2][0] == c) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        char[][] board = new char[3][3];
+
+        int xCount = 0;
+        int zeroCount = 0;
+        int emptyCount = 0;
+
+        for (int i = 0; i < 3; i++) {
+            board[i] = br.readLine().toCharArray();
+
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == 'X') {
+                    xCount++;
+                } else if (board[i][j] == '0') {
+                    zeroCount++;
+                } else {
+                    emptyCount++;
+                }
+            }
+        }
+
+        boolean xWin = win(board, 'X');
+        boolean zeroWin = win(board, '0');
+
+        // Both cannot win in a valid game
+        if (xWin && zeroWin) {
+            System.out.println("illegal");
+            return;
+        }
+
+        // X wins
+        if (xWin) {
+            if (xCount == zeroCount + 1) {
+                System.out.println("the first player won");
+            } else {
+                System.out.println("illegal");
+            }
+            return;
+        }
+
+        // 0 wins
+        if (zeroWin) {
+            if (xCount == zeroCount) {
+                System.out.println("the second player won");
+            } else {
+                System.out.println("illegal");
+            }
+            return;
+        }
+
+        // Invalid counts
+        if (xCount != zeroCount &&
+            xCount != zeroCount + 1) {
+            System.out.println("illegal");
+            return;
+        }
+
+        // Board completely filled
+        if (emptyCount == 0) {
+            System.out.println("draw");
+            return;
+        }
+
+        // Whose turn?
+        if (xCount == zeroCount) {
+            System.out.println("first");
+        } else {
+            System.out.println("second");
+        }
+    }
+}
