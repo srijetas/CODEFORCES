@@ -1,0 +1,94 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static class Boat {
+        int power;
+        int index;
+
+        Boat(int power, int index) {
+            this.power = power;
+            this.index = index;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int n = Integer.parseInt(st.nextToken());
+        long v = Long.parseLong(st.nextToken());
+
+        ArrayList<Boat> kayaks = new ArrayList<>();
+        ArrayList<Boat> cats = new ArrayList<>();
+
+        for (int i = 1; i <= n; i++) {
+
+            st = new StringTokenizer(br.readLine());
+
+            int type = Integer.parseInt(st.nextToken());
+            int power = Integer.parseInt(st.nextToken());
+
+            if (type == 1) {
+                kayaks.add(new Boat(power, i));
+            } else {
+                cats.add(new Boat(power, i));
+            }
+        }
+
+        // Sort by capacity descending
+        kayaks.sort((a, b) -> Integer.compare(b.power, a.power));
+        cats.sort((a, b) -> Integer.compare(b.power, a.power));
+
+        // Prefix sums
+        long[] preKayak = new long[kayaks.size() + 1];
+        long[] preCat = new long[cats.size() + 1];
+
+        for (int i = 0; i < kayaks.size(); i++) {
+            preKayak[i + 1] = preKayak[i] + kayaks.get(i).power;
+        }
+
+        for (int i = 0; i < cats.size(); i++) {
+            preCat[i + 1] = preCat[i] + cats.get(i).power;
+        }
+
+        long maxPower = 0;
+        int bestCats = 0;
+        int bestKayaks = 0;
+
+        // Try number of catamarans
+        int maxCats = (int) Math.min((long) cats.size(), v / 2);
+
+        for (int c = 0; c <= maxCats; c++) {
+
+            long remainingSpace = v - 2L * c;
+
+            int k = (int) Math.min((long) kayaks.size(), remainingSpace);
+
+            long currentPower = preCat[c] + preKayak[k];
+
+            if (currentPower > maxPower) {
+                maxPower = currentPower;
+                bestCats = c;
+                bestKayaks = k;
+            }
+        }
+
+        System.out.println(maxPower);
+
+        StringBuilder ans = new StringBuilder();
+
+        for (int i = 0; i < bestCats; i++) {
+            ans.append(cats.get(i).index).append(" ");
+        }
+
+        for (int i = 0; i < bestKayaks; i++) {
+            ans.append(kayaks.get(i).index).append(" ");
+        }
+
+        System.out.println(ans.toString().trim());
+    }
+}
