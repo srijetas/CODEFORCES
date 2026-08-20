@@ -1,0 +1,40 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine());
+
+        HashSet<String> registered = new HashSet<>();
+        HashMap<String, Integer> nextNumber = new HashMap<>();
+
+        StringBuilder output = new StringBuilder();
+
+        for (int i = 0; i < n; i++) {
+            String name = br.readLine();
+
+            if (!registered.contains(name)) {
+                registered.add(name);
+                output.append("OK\n");
+            } else {
+                int num = nextNumber.getOrDefault(name, 1);
+
+                String newName = name + num;
+
+                while (registered.contains(newName)) {
+                    num++;
+                    newName = name + num;
+                }
+
+                registered.add(newName);
+                nextNumber.put(name, num + 1);
+
+                output.append(newName).append('\n');
+            }
+        }
+
+        System.out.print(output);
+    }
+}
