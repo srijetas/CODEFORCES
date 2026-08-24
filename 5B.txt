@@ -1,0 +1,53 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        List<String> lines = new ArrayList<>();
+        String s;
+        int maxLen = 0;
+
+        while ((s = br.readLine()) != null) {
+            lines.add(s);
+            maxLen = Math.max(maxLen, s.length());
+        }
+
+        String border = "*".repeat(maxLen + 2);
+        StringBuilder ans = new StringBuilder();
+
+        ans.append(border).append('\n');
+
+        boolean leftFirst = true;
+
+        for (String line : lines) {
+            int spaces = maxLen - line.length();
+
+            int left = spaces / 2;
+            int right = spaces / 2;
+
+            // Odd number of extra spaces
+            if (spaces % 2 != 0) {
+                if (leftFirst) {
+                    right++;
+                } else {
+                    left++;
+                }
+
+                leftFirst = !leftFirst;
+            }
+
+            ans.append("*");
+            ans.append(" ".repeat(left));
+            ans.append(line);
+            ans.append(" ".repeat(right));
+            ans.append("*");
+            ans.append('\n');
+        }
+
+        ans.append(border);
+
+        System.out.print(ans);
+    }
+}
