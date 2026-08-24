@@ -1,0 +1,35 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        Set<String> chat = new HashSet<>();
+        long ans = 0;
+
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+
+            if (line.charAt(0) == '+') {
+                // Add person
+                String name = line.substring(1);
+                chat.add(name);
+
+            } else if (line.charAt(0) == '-') {
+                // Remove person
+                String name = line.substring(1);
+                chat.remove(name);
+
+            } else {
+                // Send command
+                int colon = line.indexOf(':');
+
+                String message = line.substring(colon + 1);
+
+                ans += (long) message.length() * chat.size();
+            }
+        }
+
+        System.out.println(ans);
+    }
+}
