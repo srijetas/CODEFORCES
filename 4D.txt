@@ -1,0 +1,110 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static class Envelope {
+        int w, h, index;
+
+        Envelope(int w, int h, int index) {
+            this.w = w;
+            this.h = h;
+            this.index = index;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int n = Integer.parseInt(st.nextToken());
+        int W = Integer.parseInt(st.nextToken());
+        int H = Integer.parseInt(st.nextToken());
+
+        ArrayList<Envelope> list = new ArrayList<>();
+
+        for (int i = 1; i <= n; i++) {
+
+            st = new StringTokenizer(br.readLine());
+
+            int w = Integer.parseInt(st.nextToken());
+            int h = Integer.parseInt(st.nextToken());
+
+            // Envelope must be strictly bigger than the card
+            if (w > W && h > H) {
+                list.add(new Envelope(w, h, i));
+            }
+        }
+
+        // No envelope can contain the card
+        if (list.isEmpty()) {
+            System.out.println(0);
+            return;
+        }
+
+        // Sort by width, then height
+        list.sort((a, b) -> {
+            if (a.w != b.w) {
+                return Integer.compare(a.w, b.w);
+            }
+            return Integer.compare(a.h, b.h);
+        });
+
+        int m = list.size();
+
+        int[] dp = new int[m];
+        int[] parent = new int[m];
+
+        Arrays.fill(dp, 1);
+        Arrays.fill(parent, -1);
+
+        int best = 0;
+        int bestIndex = -1;
+
+        // LIS with two conditions:
+        // width strictly increasing
+        // height strictly increasing
+        for (int i = 0; i < m; i++) {
+
+            for (int j = 0; j < i; j++) {
+
+                if (list.get(j).w < list.get(i).w &&
+                    list.get(j).h < list.get(i).h) {
+
+                    if (dp[j] + 1 > dp[i]) {
+                        dp[i] = dp[j] + 1;
+                        parent[i] = j;
+                    }
+                }
+            }
+
+            if (dp[i] > best) {
+                best = dp[i];
+                bestIndex = i;
+            }
+        }
+
+        // Reconstruct answer
+        ArrayList<Integer> answer = new ArrayList<>();
+
+        int current = bestIndex;
+
+        while (current != -1) {
+            answer.add(list.get(current).index);
+            current = parent[current];
+        }
+
+        // Currently largest -> smallest
+        Collections.reverse(answer);
+
+        System.out.println(best);
+
+        for (int index : answer) {
+            System.out.print(index + " ");
+        }
+
+        System.out.println();
+    }
+}
