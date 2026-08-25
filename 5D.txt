@@ -1,0 +1,117 @@
+import java.util.*;
+
+public class Main {
+
+    static double travel(double distance, double startSpeed,
+                         double maxSpeed, double a) {
+
+        if (distance <= 0)
+            return 0.0;
+
+        // Distance needed to accelerate from startSpeed to maxSpeed
+        double accelDist =
+                (maxSpeed * maxSpeed - startSpeed * startSpeed) / (2.0 * a);
+
+        if (accelDist >= distance) {
+            // Never reaches maxSpeed
+            return (Math.sqrt(startSpeed * startSpeed + 2.0 * a * distance)
+                    - startSpeed) / a;
+        }
+
+        // Accelerate to maxSpeed
+        double accelTime = (maxSpeed - startSpeed) / a;
+
+        // Cruise at maxSpeed
+        double remaining = distance - accelDist;
+        double cruiseTime = remaining / maxSpeed;
+
+        return accelTime + cruiseTime;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        double a = sc.nextDouble();
+        double v = sc.nextDouble();
+
+        double l = sc.nextDouble();
+        double d = sc.nextDouble();
+        double w = sc.nextDouble();
+
+        double answer;
+
+        // Sign doesn't matter
+        if (v <= w) {
+            answer = travel(l, 0, v, a);
+        } 
+        else {
+
+            /*
+             * Maximum speed we can have before the sign
+             * while still being able to decelerate to w at d.
+             */
+            double possiblePeak =
+                    Math.sqrt(a * d + (w * w) / 2.0);
+
+            double timeBeforeSign;
+            double speedAtSign = w;
+
+            if (possiblePeak <= w) {
+
+                // We cannot even reach w before the sign.
+                speedAtSign = Math.sqrt(2.0 * a * d);
+
+                timeBeforeSign =
+                        speedAtSign / a;
+
+            } 
+            else if (possiblePeak <= v) {
+
+                // Accelerate to possiblePeak, then brake to w.
+                double peak = possiblePeak;
+
+                double accelerateTime = peak / a;
+                double brakeTime = (peak - w) / a;
+
+                timeBeforeSign =
+                        accelerateTime + brakeTime;
+
+            } 
+            else {
+
+                /*
+                 * We can reach maximum speed v,
+                 * cruise at v, then brake to w.
+                 */
+
+                double distanceAccelerating =
+                        v * v / (2.0 * a);
+
+                double distanceBraking =
+                        (v * v - w * w) / (2.0 * a);
+
+                double cruiseDistance =
+                        d - distanceAccelerating - distanceBraking;
+
+                double accelerateTime = v / a;
+                double cruiseTime = cruiseDistance / v;
+                double brakeTime = (v - w) / a;
+
+                timeBeforeSign =
+                        accelerateTime + cruiseTime + brakeTime;
+            }
+
+            /*
+             * After the sign, speed restriction disappears.
+             * Start from speed w and accelerate toward v.
+             */
+            double timeAfterSign =
+                    travel(l - d, speedAtSign, v, a);
+
+            answer = timeBeforeSign + timeAfterSign;
+        }
+
+        System.out.printf("%.12f%n", answer);
+    }
+}
