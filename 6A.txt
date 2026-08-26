@@ -1,0 +1,49 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int[] a = new int[4];
+
+        for (int i = 0; i < 4; i++) {
+            a[i] = sc.nextInt();
+        }
+
+        boolean triangle = false;
+        boolean segment = false;
+
+        // Choose any 3 sticks
+        for (int i = 0; i < 4; i++) {
+            for (int j = i + 1; j < 4; j++) {
+                for (int k = j + 1; k < 4; k++) {
+
+                    int x = a[i];
+                    int y = a[j];
+                    int z = a[k];
+
+                    // Make z the largest
+                    int max = Math.max(x, Math.max(y, z));
+                    int sum = x + y + z - max;
+
+                    if (sum > max) {
+                        triangle = true;
+                    } 
+                    else if (sum == max) {
+                        segment = true;
+                    }
+                }
+            }
+        }
+
+        if (triangle) {
+            System.out.println("TRIANGLE");
+        } 
+        else if (segment) {
+            System.out.println("SEGMENT");
+        } 
+        else {
+            System.out.println("IMPOSSIBLE");
+        }
+    }
+}
