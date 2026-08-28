@@ -1,0 +1,92 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
+
+        int[] h = new int[n];
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < n; i++) {
+            h[i] = Integer.parseInt(st.nextToken());
+        }
+
+        // Deque for minimum values
+        int[] minDeque = new int[n];
+        int minHead = 0, minTail = 0;
+
+        // Deque for maximum values
+        int[] maxDeque = new int[n];
+        int maxHead = 0, maxTail = 0;
+
+        int left = 0;
+
+        int best = 0;
+        ArrayList<int[]> answer = new ArrayList<>();
+
+        for (int right = 0; right < n; right++) {
+
+            // Insert into min deque
+            while (minTail > minHead &&
+                    h[minDeque[minTail - 1]] >= h[right]) {
+                minTail--;
+            }
+            minDeque[minTail++] = right;
+
+            // Insert into max deque
+            while (maxTail > maxHead &&
+                    h[maxDeque[maxTail - 1]] <= h[right]) {
+                maxTail--;
+            }
+            maxDeque[maxTail++] = right;
+
+            // Shrink window while max - min > k
+            while (h[maxDeque[maxHead]] - h[minDeque[minHead]] > k) {
+
+                if (minDeque[minHead] == left) {
+                    minHead++;
+                }
+
+                if (maxDeque[maxHead] == left) {
+                    maxHead++;
+                }
+
+                left++;
+            }
+
+            int len = right - left + 1;
+
+            // Found a larger valid window
+            if (len > best) {
+                best = len;
+                answer.clear();
+                answer.add(new int[]{left + 1, right + 1});
+            }
+
+            // Found another window of maximum length
+            else if (len == best) {
+                answer.add(new int[]{left + 1, right + 1});
+            }
+        }
+
+        StringBuilder out = new StringBuilder();
+
+        out.append(best).append(' ')
+           .append(answer.size()).append('\n');
+
+        for (int[] interval : answer) {
+            out.append(interval[0])
+               .append(' ')
+               .append(interval[1])
+               .append('\n');
+        }
+
+        System.out.print(out);
+    }
+}

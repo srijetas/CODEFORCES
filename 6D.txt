@@ -1,0 +1,176 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int n, a, b;
+    static int[] h;
+
+    // memo[i][prev][cur][next]
+    static int[][][][] memo;
+    static int[][][][] choice;
+
+    static final int INF = 1_000_000;
+
+    // Convert health (-1 ... 15) to array index (0 ... 16)
+    static int idx(int x) {
+        return x + 1;
+    }
+
+    // Health below 0 is equivalent for future decisions.
+    static int cap(int x) {
+        return Math.max(x, -1);
+    }
+
+    /*
+        i     = archer currently being attacked
+        prev  = health of i-1
+        cur   = health of i
+        next  = health of i+1
+
+        We need to kill prev before moving forward.
+    */
+    static int dp(int i, int prev, int cur, int next) {
+
+        prev = cap(prev);
+        cur = cap(cur);
+        next = cap(next);
+
+        // We cannot attack archer n.
+        if (i == n) {
+            return (prev < 0 && cur < 0) ? 0 : INF;
+        }
+
+        int p = idx(prev);
+        int c = idx(cur);
+        int nx = idx(next);
+
+        if (memo[i][p][c][nx] != -1) {
+            return memo[i][p][c][nx];
+        }
+
+        int best = INF;
+        int bestK = -1;
+
+        /*
+         * At most 16 attacks are ever necessary.
+         *
+         * prev <= 15 and b >= 1, so 16 attacks
+         * are enough to kill prev.
+         */
+        for (int k = 0; k <= 16; k++) {
+
+            int newPrev = prev - k * b;
+
+            // Archer i-1 MUST die now.
+            if (newPrev >= 0) {
+                continue;
+            }
+
+            int newCur = cap(cur - k * a);
+            int newNext = cap(next - k * b);
+
+            // Health of i+2 has not been touched yet.
+            int after;
+
+            if (i + 1 == n) {
+                // Next call will be dp(n,...)
+                after = dp(i + 1, newCur, newNext, -1);
+            } else {
+                after = dp(i + 1, newCur, newNext, h[i + 2]);
+            }
+
+            if (after != INF && k + after < best) {
+                best = k + after;
+                bestK = k;
+            }
+        }
+
+        memo[i][p][c][nx] = best;
+        choice[i][p][c][nx] = bestK;
+
+        return best;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st =
+                new StringTokenizer(br.readLine());
+
+        n = Integer.parseInt(st.nextToken());
+        a = Integer.parseInt(st.nextToken());
+        b = Integer.parseInt(st.nextToken());
+
+        h = new int[n + 2];
+
+        st = new StringTokenizer(br.readLine());
+
+        for (int i = 1; i <= n; i++) {
+            h[i] = Integer.parseInt(st.nextToken());
+        }
+
+        /*
+         * Health values are capped at -1.
+         * So possible values are:
+         *
+         * -1, 0, 1, ..., 15
+         *
+         * = 17 possibilities.
+         */
+        memo = new int[n + 1][17][17][17];
+        choice = new int[n + 1][17][17][17];
+
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j < 17; j++) {
+                for (int k = 0; k < 17; k++) {
+                    Arrays.fill(memo[i][j][k], -1);
+                    Arrays.fill(choice[i][j][k], -1);
+                }
+            }
+        }
+
+        int ans = dp(2, h[1], h[2], h[3]);
+
+        System.out.println(ans);
+
+        // Reconstruct answer
+        int i = 2;
+        int prev = h[1];
+        int cur = h[2];
+        int next = h[3];
+
+        StringBuilder out = new StringBuilder();
+
+        while (i < n) {
+
+            prev = cap(prev);
+            cur = cap(cur);
+            next = cap(next);
+
+            int k = choice[i][idx(prev)][idx(cur)][idx(next)];
+
+            for (int j = 0; j < k; j++) {
+                out.append(i).append(' ');
+            }
+
+            int newCur = cap(cur - k * a);
+            int newNext = cap(next - k * b);
+
+            prev = newCur;
+            cur = newNext;
+
+            if (i + 1 == n) {
+                next = -1;
+            } else {
+                next = h[i + 2];
+            }
+
+            i++;
+        }
+
+        System.out.println(out);
+    }
+}
