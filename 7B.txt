@@ -1,0 +1,151 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static class Block {
+        int id;
+        int start;
+        int size;
+        boolean alive;
+
+        Block(int id, int start, int size) {
+            this.id = id;
+            this.start = start;
+            this.size = size;
+            this.alive = true;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int t = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+
+        boolean[] used = new boolean[m];
+
+        // At most t successful allocations
+        Block[] blocks = new Block[t + 1];
+
+        int nextId = 1;
+
+        StringBuilder output = new StringBuilder();
+
+        for (int q = 0; q < t; q++) {
+
+            StringTokenizer cmd = new StringTokenizer(br.readLine());
+            String operation = cmd.nextToken();
+
+            // ---------------- ALLOC ----------------
+            if (operation.equals("alloc")) {
+
+                int n = Integer.parseInt(cmd.nextToken());
+
+                int start = -1;
+
+                // Find first n consecutive free bytes
+                for (int i = 0; i < m; i++) {
+
+                    if (i + n > m)
+                        break;
+
+                    boolean possible = true;
+
+                    for (int j = i; j < i + n; j++) {
+                        if (used[j]) {
+                            possible = false;
+                            break;
+                        }
+                    }
+
+                    if (possible) {
+                        start = i;
+                        break;
+                    }
+                }
+
+                if (start == -1) {
+                    output.append("NULL\n");
+                } else {
+
+                    // Mark memory as used
+                    for (int i = start; i < start + n; i++) {
+                        used[i] = true;
+                    }
+
+                    Block block = new Block(nextId, start, n);
+                    blocks[nextId] = block;
+
+                    output.append(nextId).append('\n');
+
+                    nextId++;
+                }
+            }
+
+            // ---------------- ERASE ----------------
+            else if (operation.equals("erase")) {
+
+                int id = Integer.parseInt(cmd.nextToken());
+
+                if (id <= 0 || id >= blocks.length ||
+                    blocks[id] == null || !blocks[id].alive) {
+
+                    output.append("ILLEGAL_ERASE_ARGUMENT\n");
+
+                } else {
+
+                    Block block = blocks[id];
+
+                    // Free its memory
+                    for (int i = block.start;
+                         i < block.start + block.size;
+                         i++) {
+
+                        used[i] = false;
+                    }
+
+                    block.alive = false;
+                }
+            }
+
+            // ---------------- DEFRAGMENT ----------------
+            else if (operation.equals("defragment")) {
+
+                List<Block> active = new ArrayList<>();
+
+                // Collect active blocks
+                for (int id = 1; id < nextId; id++) {
+                    if (blocks[id] != null && blocks[id].alive) {
+                        active.add(blocks[id]);
+                    }
+                }
+
+                // VERY IMPORTANT:
+                // Preserve current spatial order, not ID order.
+                active.sort(Comparator.comparingInt(b -> b.start));
+
+                // Make all memory free first
+                Arrays.fill(used, false);
+
+                int current = 0;
+
+                // Move blocks towards beginning
+                for (Block block : active) {
+
+                    block.start = current;
+
+                    for (int i = 0; i < block.size; i++) {
+                        used[current + i] = true;
+                    }
+
+                    current += block.size;
+                }
+            }
+        }
+
+        System.out.print(output);
+    }
+}
