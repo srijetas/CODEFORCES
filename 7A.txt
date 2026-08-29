@@ -1,0 +1,58 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        char[][] board = new char[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            String s = sc.next();
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = s.charAt(j);
+            }
+        }
+
+        int rows = 0;
+        int cols = 0;
+
+        // Count completely black rows
+        for (int i = 0; i < 8; i++) {
+            boolean allBlack = true;
+
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] != 'B') {
+                    allBlack = false;
+                    break;
+                }
+            }
+
+            if (allBlack) {
+                rows++;
+            }
+        }
+
+        // Count completely black columns
+        for (int j = 0; j < 8; j++) {
+            boolean allBlack = true;
+
+            for (int i = 0; i < 8; i++) {
+                if (board[i][j] != 'B') {
+                    allBlack = false;
+                    break;
+                }
+            }
+
+            if (allBlack) {
+                cols++;
+            }
+        }
+
+        // Entire board is black
+        if (rows == 8 && cols == 8) {
+            System.out.println(8);
+        } else {
+            System.out.println(rows + cols);
+        }
+    }
+}
