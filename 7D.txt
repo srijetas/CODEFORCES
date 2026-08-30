@@ -1,0 +1,102 @@
+import java.io.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+
+        int n = s.length();
+
+        // Manacher's algorithm:
+        // d1[i] = radius of odd-length palindrome centered at i
+        // d2[i] = radius of even-length palindrome centered between i-1 and i
+        int[] d1 = new int[n];
+        int[] d2 = new int[n];
+
+        // Odd palindromes
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 1 : Math.min(d1[l + r - i], r - i + 1);
+
+            while (i - k >= 0 && i + k < n &&
+                    s.charAt(i - k) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d1[i] = k--;
+
+            if (i + k > r) {
+                l = i - k;
+                r = i + k;
+            }
+        }
+
+        // Even palindromes
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 0 : Math.min(d2[l + r - i + 1], r - i + 1);
+
+            while (i - k - 1 >= 0 && i + k < n &&
+                    s.charAt(i - k - 1) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d2[i] = k--;
+
+            if (i + k > r) {
+                l = i - k - 1;
+                r = i + k;
+            }
+        }
+
+        /*
+         * degree[i] = palindrome degree of prefix s[0...i]
+         *
+         * A prefix is a palindrome if its longest palindrome
+         * starting at 0 reaches i.
+         *
+         * We can determine this using the Manacher arrays.
+         */
+        int[] degree = new int[n];
+
+        long answer = 0;
+
+        for (int len = 1; len <= n; len++) {
+            int end = len - 1;
+
+            boolean palindrome = false;
+
+            // Odd length
+            if ((len & 1) == 1) {
+                int center = end / 2;
+
+                if (d1[center] >= center + 1) {
+                    palindrome = true;
+                }
+            }
+            // Even length
+            else {
+                int center = len / 2;
+
+                if (d2[center] >= center) {
+                    palindrome = true;
+                }
+            }
+
+            if (palindrome) {
+                // Prefix and suffix of a palindrome of length len
+                // have length len / 2.
+                int half = len / 2;
+
+                if (half == 0) {
+                    degree[end] = 1;
+                } else {
+                    degree[end] = degree[half - 1] + 1;
+                }
+            }
+
+            answer += degree[end];
+        }
+
+        System.out.println(answer);
+    }
+}
