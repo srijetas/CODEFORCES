@@ -1,0 +1,58 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static long extGCD(long a, long b, long[] xy) {
+        if (b == 0) {
+            xy[0] = 1;
+            xy[1] = 0;
+            return a;
+        }
+
+        long[] next = new long[2];
+        long g = extGCD(b, a % b, next);
+
+        xy[0] = next[1];
+        xy[1] = next[0] - (a / b) * next[1];
+
+        return g;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        long A = sc.nextLong();
+        long B = sc.nextLong();
+        long C = sc.nextLong();
+
+        long a = Math.abs(A);
+        long b = Math.abs(B);
+
+        long[] xy = new long[2];
+
+        long gcd = extGCD(a, b, xy);
+
+        // Need A*x + B*y = -C
+        if ((-C) % gcd != 0) {
+            System.out.println("-1");
+            return;
+        }
+
+        // Restore signs
+        if (A < 0) {
+            xy[0] = -xy[0];
+        }
+
+        if (B < 0) {
+            xy[1] = -xy[1];
+        }
+
+        long multiplier = (-C) / gcd;
+
+        long x = xy[0] * multiplier;
+        long y = xy[1] * multiplier;
+
+        System.out.println(x + " " + y);
+    }
+}
