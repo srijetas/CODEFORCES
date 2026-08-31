@@ -1,0 +1,49 @@
+import java.io.*;
+
+public class Main {
+
+    static boolean check(String s, String a, String b) {
+        int pos = 0;
+
+        while (true) {
+            int first = s.indexOf(a, pos);
+
+            if (first == -1)
+                return false;
+
+            // b must occur completely after a
+            int second = s.indexOf(b, first + a.length());
+
+            if (second != -1)
+                return true;
+
+            // Try next occurrence of a
+            pos = first + 1;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        String s = br.readLine();
+        String a = br.readLine();
+        String b = br.readLine();
+
+        boolean forward = check(s, a, b);
+
+        String rev = new StringBuilder(s).reverse().toString();
+
+        boolean backward = check(rev, a, b);
+
+        if (forward && backward)
+            System.out.println("both");
+        else if (forward)
+            System.out.println("forward");
+        else if (backward)
+            System.out.println("backward");
+        else
+            System.out.println("fantasy");
+    }
+}
