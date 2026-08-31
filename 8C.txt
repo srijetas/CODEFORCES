@@ -1,0 +1,167 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int n;
+    static long[] x;
+    static long[] y;
+    static long[] dist;
+    static long[][] between;
+
+    static long[] dp;
+    static int[] choice;
+
+    static long distance(int i, int j) {
+        long dx = x[i] - x[j];
+        long dy = y[i] - y[j];
+        return dx * dx + dy * dy;
+    }
+
+    static long solve(int mask) {
+
+        if (mask == (1 << n) - 1)
+            return 0;
+
+        if (dp[mask] != -1)
+            return dp[mask];
+
+        // Find first object which hasn't been collected
+        int first = 0;
+
+        while ((mask & (1 << first)) != 0)
+            first++;
+
+        // Option 1: take only 'first'
+        long best =
+                2 * dist[first]
+                + solve(mask | (1 << first));
+
+        choice[mask] = -first - 1;
+
+        // Option 2: take 'first' together with another object
+        for (int j = first + 1; j < n; j++) {
+
+            if ((mask & (1 << j)) != 0)
+                continue;
+
+            long newCost =
+                    dist[first]
+                    + between[first][j]
+                    + dist[j]
+                    + solve(
+                        mask
+                        | (1 << first)
+                        | (1 << j)
+                    );
+
+            if (newCost < best) {
+                best = newCost;
+
+                // Store the second object.
+                choice[mask] = j;
+            }
+        }
+
+        return dp[mask] = best;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(
+                        new InputStreamReader(System.in)
+                );
+
+        StringTokenizer st =
+                new StringTokenizer(br.readLine());
+
+        long xs = Long.parseLong(st.nextToken());
+        long ys = Long.parseLong(st.nextToken());
+
+        n = Integer.parseInt(br.readLine());
+
+        x = new long[n];
+        y = new long[n];
+
+        for (int i = 0; i < n; i++) {
+
+            st = new StringTokenizer(br.readLine());
+
+            x[i] = Long.parseLong(st.nextToken());
+            y[i] = Long.parseLong(st.nextToken());
+        }
+
+        /*
+         * Add handbag as point 0 conceptually.
+         */
+        dist = new long[n];
+
+        for (int i = 0; i < n; i++) {
+            long dx = x[i] - xs;
+            long dy = y[i] - ys;
+
+            dist[i] = dx * dx + dy * dy;
+        }
+
+        between = new long[n][n];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+
+                between[i][j] =
+                        between[j][i] =
+                        distance(i, j);
+            }
+        }
+
+        int total = 1 << n;
+
+        dp = new long[total];
+        Arrays.fill(dp, -1);
+
+        choice = new int[total];
+
+        long answer = solve(0);
+
+        System.out.println(answer);
+
+        /*
+         * Reconstruct the path.
+         */
+        StringBuilder path = new StringBuilder();
+
+        path.append("0 ");
+
+        int mask = 0;
+
+        while (mask != total - 1) {
+
+            int first = 0;
+
+            while ((mask & (1 << first)) != 0)
+                first++;
+
+            int c = choice[mask];
+
+            if (c < 0) {
+                // Only first object was taken
+                path.append(first + 1).append(" ");
+                path.append("0 ");
+
+                mask |= (1 << first);
+
+            } else {
+                // first + c were taken together
+                path.append(first + 1).append(" ");
+                path.append(c + 1).append(" ");
+                path.append("0 ");
+
+                mask |= (1 << first);
+                mask |= (1 << c);
+            }
+        }
+
+        System.out.println(path);
+    }
+}
