@@ -1,0 +1,78 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static long encode(int x, int y) {
+        return (((long) x) << 32) ^ (y & 0xffffffffL);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        String s = br.readLine().trim();
+
+        Set<Long> visited = new HashSet<>();
+
+        int x = 0;
+        int y = 0;
+
+        visited.add(encode(x, y));
+
+        for (char c : s.toCharArray()) {
+
+            // Move robot
+            if (c == 'L') x--;
+            else if (c == 'R') x++;
+            else if (c == 'U') y++;
+            else if (c == 'D') y--;
+
+            long current = encode(x, y);
+
+            // Already visited -> cycle
+            if (visited.contains(current)) {
+                System.out.println("BUG");
+                return;
+            }
+
+            /*
+             * Check all 4 neighboring cells.
+             *
+             * The previous cell is always one of them,
+             * and that one is allowed.
+             */
+            int px = x;
+            int py = y;
+
+            if (c == 'L') px++;
+            else if (c == 'R') px--;
+            else if (c == 'U') py--;
+            else if (c == 'D') py++;
+
+            int[] dx = {1, -1, 0, 0};
+            int[] dy = {0, 0, 1, -1};
+
+            for (int i = 0; i < 4; i++) {
+
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+
+                // This is the cell we just came from
+                if (nx == px && ny == py)
+                    continue;
+
+                // Another visited neighbor => shortcut exists
+                if (visited.contains(encode(nx, ny))) {
+                    System.out.println("BUG");
+                    return;
+                }
+            }
+
+            visited.add(current);
+        }
+
+        System.out.println("OK");
+    }
+}
