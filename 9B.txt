@@ -1,0 +1,55 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        double vb = sc.nextInt();
+        double vs = sc.nextInt();
+
+        int[] x = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            x[i] = sc.nextInt();
+        }
+
+        int xu = sc.nextInt();
+        int yu = sc.nextInt();
+
+        int answer = 1; // second stop (0-based index)
+        double minTime = Double.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
+
+        for (int i = 1; i < n; i++) {
+
+            double distance = Math.sqrt(
+                    (double) (x[i] - xu) * (x[i] - xu)
+                    + (double) yu * yu
+            );
+
+            double busTime = x[i] / vb;
+            double runTime = distance / vs;
+
+            double totalTime = busTime + runTime;
+
+            if (totalTime < minTime - 1e-9) {
+                minTime = totalTime;
+                minDistance = distance;
+                answer = i;
+
+            } else if (Math.abs(totalTime - minTime) < 1e-9) {
+
+                // Same time -> choose stop closer to university
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    answer = i;
+                }
+            }
+        }
+
+        // Convert 0-based index to 1-based
+        System.out.println(answer + 1);
+    }
+}
