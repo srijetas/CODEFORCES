@@ -1,0 +1,28 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    static int n;
+    static int count = 0;
+
+    static void generate(long x) {
+        if (x > n) return;
+
+        if (x > 0) {
+            count++;
+        }
+
+        generate(x * 10);
+        generate(x * 10 + 1);
+    }
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        n = Integer.parseInt(br.readLine().trim());
+
+        generate(1);
+
+        System.out.println(count);
+    }
+}
