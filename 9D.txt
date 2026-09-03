@@ -1,0 +1,42 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int h = sc.nextInt();
+
+        long[][] dp = new long[n + 1][n + 1];
+
+        // Empty tree is possible for every maximum height
+        for (int height = 0; height <= n; height++) {
+            dp[0][height] = 1;
+        }
+
+        // dp[nodes][height] =
+        // number of BSTs with 'nodes' nodes and height <= 'height'
+        for (int height = 1; height <= n; height++) {
+            for (int nodes = 1; nodes <= n; nodes++) {
+
+                long count = 0;
+
+                for (int left = 0; left < nodes; left++) {
+                    int right = nodes - 1 - left;
+
+                    count += dp[left][height - 1]
+                           * dp[right][height - 1];
+                }
+
+                dp[nodes][height] = count;
+            }
+        }
+
+        long totalBST = dp[n][n];
+        long heightLessThanH = dp[n][h - 1];
+
+        System.out.println(totalBST - heightLessThanH);
+    }
+}
