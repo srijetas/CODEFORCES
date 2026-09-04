@@ -1,0 +1,55 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int P1 = sc.nextInt();
+        int P2 = sc.nextInt();
+        int P3 = sc.nextInt();
+        int T1 = sc.nextInt();
+        int T2 = sc.nextInt();
+
+        int[] l = new int[n];
+        int[] r = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            l[i] = sc.nextInt();
+            r[i] = sc.nextInt();
+        }
+
+        long answer = 0;
+
+        // First working interval
+        answer += (long) (r[0] - l[0]) * P1;
+
+        for (int i = 1; i < n; i++) {
+
+            // Idle gap between previous work and current work
+            int gap = l[i] - r[i - 1];
+
+            // Normal mode
+            int normalTime = Math.min(gap, T1);
+            answer += (long) normalTime * P1;
+
+            gap -= normalTime;
+
+            // Screensaver mode
+            int screenTime = Math.min(gap, T2);
+            answer += (long) screenTime * P2;
+
+            gap -= screenTime;
+
+            // Sleep mode
+            answer += (long) gap * P3;
+
+            // Current working interval
+            answer += (long) (r[i] - l[i]) * P1;
+        }
+
+        System.out.println(answer);
+    }
+}
