@@ -1,0 +1,48 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int digitalRoot(int x) {
+        return (x - 1) % 9 + 1;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int N = sc.nextInt();
+
+        long[] cnt = new long[10];
+
+        // Digital roots repeat: 1,2,3,...,9
+        long full = N / 9;
+        int rem = N % 9;
+
+        for (int r = 1; r <= 9; r++) {
+            cnt[r] = full;
+            if (r <= rem) {
+                cnt[r]++;
+            }
+        }
+
+        // Count triples accepted by Billy's algorithm
+        long accepted = 0;
+
+        for (int a = 1; a <= 9; a++) {
+            for (int b = 1; b <= 9; b++) {
+                int cRoot = digitalRoot(a * b);
+
+                accepted += cnt[a] * cnt[b] * cnt[cRoot];
+            }
+        }
+
+        // Count triples where A * B = C is actually correct
+        long correct = 0;
+
+        for (int a = 1; a <= N; a++) {
+            correct += N / a;
+        }
+
+        System.out.println(accepted - correct);
+    }
+}
