@@ -1,0 +1,130 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int n;
+    static long[] a;
+
+    // Returns the number of coins used by greedy for x
+    static long greedy(long x) {
+        long cnt = 0;
+
+        for (int i = 0; i < n; i++) {
+            cnt += x / a[i];
+            x %= a[i];
+        }
+
+        return cnt;
+    }
+
+    public static void main(String[] args) throws Exception {
+        FastScanner fs = new FastScanner(System.in);
+
+        n = fs.nextInt();
+        a = new long[n];
+
+        for (int i = 0; i < n; i++) {
+            a[i] = fs.nextLong();
+        }
+
+        long answer = Long.MAX_VALUE;
+
+        /*
+         * For every boundary a[i]:
+         *
+         * Take a[i] - 1 and represent it greedily using coins
+         * a[i+1], a[i+2], ...
+         *
+         * Then increase one denomination a[j] by one.
+         * This produces all necessary candidates guaranteed by
+         * the characterization theorem for this problem.
+         */
+        for (int i = 0; i < n - 1; i++) {
+
+            long x = a[i] - 1;
+
+            long[] cnt = new long[n];
+
+            // Greedy representation of a[i] - 1
+            for (int j = i + 1; j < n; j++) {
+                cnt[j] = x / a[j];
+                x %= a[j];
+            }
+
+            // Try adding one coin of denomination a[j]
+            for (int j = i + 1; j < n; j++) {
+
+                long candidate = a[i] - 1 - x;
+
+                // Sum of greedy coins from i+1 ... j-1
+                // plus one extra coin a[j]
+                long used = 0;
+                candidate = 0;
+
+                for (int k = i + 1; k < j; k++) {
+                    candidate += cnt[k] * a[k];
+                    used += cnt[k];
+                }
+
+                candidate += (cnt[j] + 1) * a[j];
+                used += cnt[j] + 1;
+
+                if (candidate >= answer) continue;
+
+                long greedyUsed = greedy(candidate);
+
+                if (greedyUsed > used) {
+                    answer = candidate;
+                }
+            }
+        }
+
+        System.out.println(answer == Long.MAX_VALUE ? -1 : answer);
+    }
+
+    // Fast input
+    static class FastScanner {
+        private final InputStream in;
+        private final byte[] buffer = new byte[1 << 16];
+        private int ptr = 0, len = 0;
+
+        FastScanner(InputStream in) {
+            this.in = in;
+        }
+
+        private int read() throws IOException {
+            if (ptr >= len) {
+                len = in.read(buffer);
+                ptr = 0;
+                if (len <= 0) return -1;
+            }
+            return buffer[ptr++];
+        }
+
+        long nextLong() throws IOException {
+            int c;
+            do {
+                c = read();
+            } while (c <= ' ');
+
+            long sign = 1;
+            if (c == '-') {
+                sign = -1;
+                c = read();
+            }
+
+            long res = 0;
+            while (c > ' ') {
+                res = res * 10 + (c - '0');
+                c = read();
+            }
+
+            return res * sign;
+        }
+
+        int nextInt() throws IOException {
+            return (int) nextLong();
+        }
+    }
+}
