@@ -1,0 +1,24 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        long x = Math.abs(sc.nextLong());
+
+        if (x == 0) {
+            System.out.println(0);
+            return;
+        }
+
+        long sum = 0;
+        long jumps = 0;
+
+        while (sum < x || (sum - x) % 2 != 0) {
+            jumps++;
+            sum += jumps;
+        }
+
+        System.out.println(jumps);
+    }
+}
