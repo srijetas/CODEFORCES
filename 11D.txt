@@ -1,0 +1,68 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+
+        int[] adjFull = new int[n];
+        for (int i = 0; i < m; i++) {
+            int a = scanner.nextInt() - 1;
+            int b = scanner.nextInt() - 1;
+            adjFull[a] |= (1 << b);
+            adjFull[b] |= (1 << a);
+        }
+
+        long answer = 0;
+
+        for (int s = 0; s < n; s++) {
+            int k = n - s;  // vertices s..n-1 mapped to local indices 0..k-1
+
+            int[] adjLocal = new int[k];
+            for (int i = 0; i < k; i++) {
+                int g = i + s;                  // global vertex
+                int mask = adjFull[g];
+                mask &= ~((1 << s) - 1);        // keep only neighbors with global index >= s
+                adjLocal[i] = mask >>> s;        // shift down to local indexing
+            }
+
+            long[][] dp = new long[1 << k][k];
+            dp[1][0] = 1; // path consisting of just vertex s (local index 0)
+
+            for (int mask = 1; mask < (1 << k); mask++) {
+                if ((mask & 1) == 0) continue;  // must contain s
+                for (int i = 0; i < k; i++) {
+                    if ((mask & (1 << i)) == 0) continue;
+                    long cur = dp[mask][i];
+                    if (cur == 0) continue;
+
+                    int cand = adjLocal[i] & ~mask;  // unused neighbors
+                    cand &= ~1;                       // can't revisit s mid-path
+
+                    int c = cand;
+                    while (c != 0) {
+                        int j = Integer.numberOfTrailingZeros(c);
+                        c &= c - 1;
+                        dp[mask | (1 << j)][j] += cur;
+                    }
+                }
+            }
+
+            // close cycles: masks with popcount >= 3, vertex i adjacent to s
+            for (int mask = 1; mask < (1 << k); mask++) {
+                if ((mask & 1) == 0) continue;
+                if (Integer.bitCount(mask) < 3) continue;
+                for (int i = 1; i < k; i++) {
+                    if ((mask & (1 << i)) == 0) continue;
+                    if ((adjLocal[0] & (1 << i)) != 0) { // edge s-i exists
+                        answer += dp[mask][i];
+                    }
+                }
+            }
+        }
+
+        answer /= 2;
+        System.out.println(answer);
+    }
+}
