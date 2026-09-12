@@ -1,0 +1,44 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String n = br.readLine().trim();
+        String m = br.readLine().trim();
+
+        char[] digits = n.toCharArray();
+        Arrays.sort(digits);
+
+        String correct;
+        if (digits[0] != '0') {
+            // no zeros at all, or first char already non-zero after sort means... 
+            // actually need special handling below
+            correct = new String(digits);
+        } else {
+            // find first non-zero digit in sorted array
+            int idx = -1;
+            for (int i = 0; i < digits.length; i++) {
+                if (digits[i] != '0') { idx = i; break; }
+            }
+            if (idx == -1) {
+                // all zeros
+                correct = "0";
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(digits[idx]);
+                for (int i = 0; i < digits.length; i++) {
+                    if (i == idx) continue;
+                    sb.append(digits[i]);
+                }
+                correct = sb.toString();
+            }
+        }
+
+        if (correct.equals(m)) {
+            System.out.println("OK");
+        } else {
+            System.out.println("WRONG_ANSWER");
+        }
+    }
+}
