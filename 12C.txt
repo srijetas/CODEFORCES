@@ -1,0 +1,54 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+
+        // Store all prices
+        int[] prices = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            prices[i] = sc.nextInt();
+        }
+
+        // Count frequency of each fruit
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < m; i++) {
+            String fruit = sc.next();
+
+            map.put(fruit, map.getOrDefault(fruit, 0) + 1);
+        }
+
+        // Get frequencies
+        ArrayList<Integer> freq = new ArrayList<>(map.values());
+
+        // Sort frequencies
+        Collections.sort(freq);
+
+        // Sort prices
+        Arrays.sort(prices);
+
+        int min = 0;
+        int max = 0;
+
+        int k = freq.size();
+
+        // Minimum:
+        // smallest price gets highest frequency
+        for (int i = 0; i < k; i++) {
+            min += freq.get(k - 1 - i) * prices[i];
+        }
+
+        // Maximum:
+        // largest price gets highest frequency
+        for (int i = 0; i < k; i++) {
+            max += freq.get(k - 1 - i) * prices[n - 1 - i];
+        }
+
+        System.out.println(min + " " + max);
+    }
+}
