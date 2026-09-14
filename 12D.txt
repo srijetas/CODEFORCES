@@ -1,0 +1,226 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static class Lady {
+        int b, i, r;
+
+        Lady(int b, int i, int r) {
+            this.b = b;
+            this.i = i;
+            this.r = r;
+        }
+    }
+
+    static class Fenwick {
+        int n;
+        int[] tree;
+
+        Fenwick(int n) {
+            this.n = n;
+            tree = new int[n + 1];
+            Arrays.fill(tree, -1);
+        }
+
+        // Store maximum richness
+        void update(int idx, int value) {
+            while (idx <= n) {
+                tree[idx] = Math.max(tree[idx], value);
+                idx += idx & -idx;
+            }
+        }
+
+        // Maximum richness in prefix
+        int query(int idx) {
+            int ans = -1;
+
+            while (idx > 0) {
+                ans = Math.max(ans, tree[idx]);
+                idx -= idx & -idx;
+            }
+
+            return ans;
+        }
+    }
+
+    static int lowerBound(int[] a, int n, int x) {
+        int lo = 0, hi = n;
+
+        while (lo < hi) {
+            int mid = (lo + hi) >>> 1;
+
+            if (a[mid] < x)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        return lo;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        FastScanner fs = new FastScanner(System.in);
+
+        int n = fs.nextInt();
+
+        int[] B = new int[n];
+        int[] I = new int[n];
+        int[] R = new int[n];
+
+        for (int i = 0; i < n; i++)
+            B[i] = fs.nextInt();
+
+        for (int i = 0; i < n; i++)
+            I[i] = fs.nextInt();
+
+        for (int i = 0; i < n; i++)
+            R[i] = fs.nextInt();
+
+        Lady[] ladies = new Lady[n];
+
+        for (int i = 0; i < n; i++) {
+            ladies[i] = new Lady(B[i], I[i], R[i]);
+        }
+
+        // Beauty descending
+        Arrays.sort(ladies, (a, b) -> {
+            return Integer.compare(b.b, a.b);
+        });
+
+        // Coordinate compression of intellect
+        int[] compressed = I.clone();
+        Arrays.sort(compressed);
+
+        int m = 0;
+
+        for (int x : compressed) {
+            if (m == 0 || compressed[m - 1] != x) {
+                compressed[m++] = x;
+            }
+        }
+
+        /*
+         * Reverse rank:
+         *
+         * Larger intellect -> smaller Fenwick index.
+         *
+         * This lets us query all intellect values STRICTLY
+         * greater than current intellect using a prefix query.
+         */
+        Fenwick bit = new Fenwick(m);
+
+        long answer = 0;
+
+        int pos = 0;
+
+        while (pos < n) {
+
+            int end = pos;
+
+            // Same beauty group
+            while (end < n &&
+                   ladies[end].b == ladies[pos].b) {
+                end++;
+            }
+
+            /*
+             * STEP 1:
+             * Query only ladies with GREATER beauty.
+             */
+            for (int k = pos; k < end; k++) {
+
+                int rank = lowerBound(
+                        compressed,
+                        m,
+                        ladies[k].i
+                );
+
+                // Reverse rank
+                int reverseRank = m - rank;
+
+                // We need I > current I.
+                // So exclude current I itself.
+                int betterIntellect =
+                        bit.query(reverseRank - 1);
+
+                if (betterIntellect > ladies[k].r) {
+                    answer++;
+                }
+            }
+
+            /*
+             * STEP 2:
+             * Add current beauty group.
+             *
+             * This is done AFTER querying so that equal beauty
+             * does not count.
+             */
+            for (int k = pos; k < end; k++) {
+
+                int rank = lowerBound(
+                        compressed,
+                        m,
+                        ladies[k].i
+                );
+
+                int reverseRank = m - rank;
+
+                bit.update(
+                        reverseRank,
+                        ladies[k].r
+                );
+            }
+
+            pos = end;
+        }
+
+        System.out.println(answer);
+    }
+
+    // Fast input
+    static class FastScanner {
+
+        private final InputStream in;
+        private final byte[] buffer = new byte[1 << 16];
+
+        private int ptr = 0;
+        private int len = 0;
+
+        FastScanner(InputStream in) {
+            this.in = in;
+        }
+
+        private int read() throws IOException {
+
+            if (ptr >= len) {
+                len = in.read(buffer);
+                ptr = 0;
+
+                if (len <= 0)
+                    return -1;
+            }
+
+            return buffer[ptr++];
+        }
+
+        int nextInt() throws IOException {
+
+            int c;
+
+            do {
+                c = read();
+            } while (c <= ' ');
+
+            int result = 0;
+
+            while (c > ' ') {
+                result = result * 10 + (c - '0');
+                c = read();
+            }
+
+            return result;
+        }
+    }
+}
