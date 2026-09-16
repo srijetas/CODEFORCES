@@ -1,0 +1,36 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int A = sc.nextInt();
+
+        int sum = 0;
+
+        for (int base = 2; base <= A - 1; base++) {
+            int n = A;
+
+            while (n > 0) {
+                sum += n % base;
+                n /= base;
+            }
+        }
+
+        int denominator = A - 2;
+
+        // Reduce fraction
+        int g = gcd(sum, denominator);
+
+        System.out.println((sum / g) + "/" + (denominator / g));
+    }
+
+    static int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = a % b;
+            a = b;
+            b = temp;
+        }
+        return a;
+    }
+}
