@@ -1,0 +1,180 @@
+ import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static class Point {
+        long x, y;
+
+        Point(long x, long y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static class Segment {
+        Point a, b;
+
+        Segment(Point a, Point b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+
+    static boolean same(Point p, Point q) {
+        return p.x == q.x && p.y == q.y;
+    }
+
+    static long cross(Point a, Point b, Point c) {
+        return (b.x - a.x) * (c.y - a.y)
+             - (b.y - a.y) * (c.x - a.x);
+    }
+
+    static long dot(Point a, Point b, Point c) {
+        return (b.x - a.x) * (c.x - a.x)
+             + (b.y - a.y) * (c.y - a.y);
+    }
+
+    static long distSq(Point a, Point b) {
+        long dx = a.x - b.x;
+        long dy = a.y - b.y;
+        return dx * dx + dy * dy;
+    }
+
+    // Point p must be on segment ab
+    static boolean onSegment(Point a, Point b, Point p) {
+        return cross(a, b, p) == 0 &&
+               p.x >= Math.min(a.x, b.x) &&
+               p.x <= Math.max(a.x, b.x) &&
+               p.y >= Math.min(a.y, b.y) &&
+               p.y <= Math.max(a.y, b.y);
+    }
+
+    // p should be strictly inside the segment
+    static boolean inside(Point a, Point b, Point p) {
+        return onSegment(a, b, p)
+                && !same(a, p)
+                && !same(b, p);
+    }
+
+    static boolean validRatio(Point a, Point b, Point p) {
+
+        long x = distSq(a, p);
+        long y = distSq(p, b);
+
+        // min(length1,length2) / max(length1,length2) >= 1/4
+        // Squaring:
+        // min(x,y) / max(x,y) >= 1/16
+
+        return 16 * Math.min(x, y) >= Math.max(x, y);
+    }
+
+    static boolean check(Segment s1, Segment s2, Segment third) {
+
+        Point common = null;
+        Point end1 = null;
+        Point end2 = null;
+
+        // Find common endpoint of s1 and s2
+        if (same(s1.a, s2.a)) {
+            common = s1.a;
+            end1 = s1.b;
+            end2 = s2.b;
+        }
+        else if (same(s1.a, s2.b)) {
+            common = s1.a;
+            end1 = s1.b;
+            end2 = s2.a;
+        }
+        else if (same(s1.b, s2.a)) {
+            common = s1.b;
+            end1 = s1.a;
+            end2 = s2.b;
+        }
+        else if (same(s1.b, s2.b)) {
+            common = s1.b;
+            end1 = s1.a;
+            end2 = s2.a;
+        }
+        else {
+            return false;
+        }
+
+        // Angle must be > 0 and <= 90 degrees
+        long cr = cross(common, end1, end2);
+        long dt = dot(common, end1, end2);
+
+        if (cr == 0 || dt < 0)
+            return false;
+
+        // Third segment must connect an inside point
+        // of s1 and an inside point of s2
+
+        Point p = third.a;
+        Point q = third.b;
+
+        if (inside(s1.a, s1.b, p) &&
+            inside(s2.a, s2.b, q)) {
+
+            return validRatio(s1.a, s1.b, p) &&
+                   validRatio(s2.a, s2.b, q);
+        }
+
+        if (inside(s1.a, s1.b, q) &&
+            inside(s2.a, s2.b, p)) {
+
+            return validRatio(s1.a, s1.b, q) &&
+                   validRatio(s2.a, s2.b, p);
+        }
+
+        return false;
+    }
+
+    static boolean solve(Segment[] s) {
+
+        // s[0], s[1] are legs, s[2] is cross segment
+        if (check(s[0], s[1], s[2]))
+            return true;
+
+        // s[0], s[2] are legs, s[1] is cross segment
+        if (check(s[0], s[2], s[1]))
+            return true;
+
+        // s[1], s[2] are legs, s[0] is cross segment
+        if (check(s[1], s[2], s[0]))
+            return true;
+
+        return false;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        int t = Integer.parseInt(br.readLine());
+
+        while (t-- > 0) {
+
+            Segment[] s = new Segment[3];
+
+            for (int i = 0; i < 3; i++) {
+
+                StringTokenizer st =
+                        new StringTokenizer(br.readLine());
+
+                long x1 = Long.parseLong(st.nextToken());
+                long y1 = Long.parseLong(st.nextToken());
+                long x2 = Long.parseLong(st.nextToken());
+                long y2 = Long.parseLong(st.nextToken());
+
+                s[i] = new Segment(
+                        new Point(x1, y1),
+                        new Point(x2, y2)
+                );
+            }
+
+            System.out.println(solve(s) ? "YES" : "NO");
+        }
+    }
+}
