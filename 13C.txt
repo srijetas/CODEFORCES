@@ -1,0 +1,68 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        long[] a = new long[n];
+        long[] values = new long[n];
+
+        for (int i = 0; i < n; i++) {
+            a[i] = sc.nextLong();
+            values[i] = a[i];
+        }
+
+        // Sort all possible values
+        Arrays.sort(values);
+
+        // Remove duplicate values
+        long[] unique = new long[n];
+        int m = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (i == 0 || values[i] != values[i - 1]) {
+                unique[m++] = values[i];
+            }
+        }
+
+        long INF = Long.MAX_VALUE / 4;
+
+        long[] dp = new long[m];
+
+        // First element
+        for (int j = 0; j < m; j++) {
+            dp[j] = Math.abs(a[0] - unique[j]);
+        }
+
+        // Remaining elements
+        for (int i = 1; i < n; i++) {
+
+            long[] newDp = new long[m];
+
+            long best = INF;
+
+            for (int j = 0; j < m; j++) {
+
+                // Previous value must be <= current value
+                best = Math.min(best, dp[j]);
+
+                newDp[j] = best +
+                        Math.abs(a[i] - unique[j]);
+            }
+
+            dp = newDp;
+        }
+
+        // Minimum cost
+        long answer = INF;
+
+        for (int j = 0; j < m; j++) {
+            answer = Math.min(answer, dp[j]);
+        }
+
+        System.out.println(answer);
+    }
+}
