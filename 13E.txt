@@ -1,0 +1,159 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int N, M;
+    static int[] a;
+    static int[] next;
+    static int[] cnt;
+    static int[] last;
+
+    static int BLOCK;
+
+    static void rebuild(int block) {
+
+        int left = block * BLOCK;
+        int right = Math.min(N, left + BLOCK);
+
+        for (int i = right - 1; i >= left; i--) {
+
+            int j = i + a[i];
+
+            if (j >= N) {
+                // Directly leaves the array
+                next[i] = j;
+                cnt[i] = 1;
+                last[i] = i;
+            }
+            else if (j >= right) {
+                // Jump goes to another block
+                next[i] = j;
+                cnt[i] = 1;
+                last[i] = i;
+            }
+            else {
+                // Jump remains inside same block
+                next[i] = next[j];
+                cnt[i] = cnt[j] + 1;
+                last[i] = last[j];
+            }
+        }
+    }
+
+    static void update(int pos, int value) {
+
+        a[pos] = value;
+
+        int block = pos / BLOCK;
+
+        rebuild(block);
+    }
+
+    static void query(int start) {
+
+        int jumps = 0;
+        int lastHole = start;
+
+        int pos = start;
+
+        while (pos < N) {
+
+            lastHole = last[pos];
+            jumps += cnt[pos];
+
+            pos = next[pos];
+        }
+
+        System.out.println((lastHole + 1) + " " + jumps);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        FastScanner fs = new FastScanner(System.in);
+
+        N = fs.nextInt();
+        M = fs.nextInt();
+
+        a = new int[N];
+        next = new int[N];
+        cnt = new int[N];
+        last = new int[N];
+
+        for (int i = 0; i < N; i++) {
+            a[i] = fs.nextInt();
+        }
+
+        // √N
+        BLOCK = (int) Math.sqrt(N) + 1;
+
+        int blocks = (N + BLOCK - 1) / BLOCK;
+
+        // Build every block
+        for (int b = 0; b < blocks; b++) {
+            rebuild(b);
+        }
+
+        while (M-- > 0) {
+
+            int type = fs.nextInt();
+
+            if (type == 0) {
+
+                int pos = fs.nextInt() - 1;
+                int value = fs.nextInt();
+
+                update(pos, value);
+
+            } else {
+
+                int start = fs.nextInt() - 1;
+
+                query(start);
+            }
+        }
+    }
+
+    // Fast input
+    static class FastScanner {
+
+        private final InputStream in;
+        private final byte[] buffer = new byte[1 << 16];
+        private int ptr = 0;
+        private int len = 0;
+
+        FastScanner(InputStream is) {
+            in = is;
+        }
+
+        private int read() throws IOException {
+
+            if (ptr >= len) {
+                len = in.read(buffer);
+                ptr = 0;
+
+                if (len <= 0)
+                    return -1;
+            }
+
+            return buffer[ptr++];
+        }
+
+        int nextInt() throws IOException {
+
+            int c;
+            do {
+                c = read();
+            } while (c <= ' ');
+
+            int num = 0;
+
+            while (c > ' ') {
+                num = num * 10 + (c - '0');
+                c = read();
+            }
+
+            return num;
+        }
+    }
+}
