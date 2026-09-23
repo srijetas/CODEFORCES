@@ -1,0 +1,41 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int x0 = sc.nextInt();
+
+        int L = 0;
+        int R = 1000;
+
+        for (int i = 0; i < n; i++) {
+            int a = sc.nextInt();
+            int b = sc.nextInt();
+
+            int left = Math.min(a, b);
+            int right = Math.max(a, b);
+
+            L = Math.max(L, left);
+            R = Math.min(R, right);
+        }
+
+        // No common position
+        if (L > R) {
+            System.out.println(-1);
+        }
+        // x0 is already inside common interval
+        else if (x0 >= L && x0 <= R) {
+            System.out.println(0);
+        }
+        // Move right
+        else if (x0 < L) {
+            System.out.println(L - x0);
+        }
+        // Move left
+        else {
+            System.out.println(x0 - R);
+        }
+    }
+}
