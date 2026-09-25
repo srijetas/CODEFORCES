@@ -1,0 +1,149 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int n;
+    static ArrayList<Integer>[] graph;
+    static int answer = 0;
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(System.in)
+        );
+
+        n = Integer.parseInt(br.readLine());
+
+        graph = new ArrayList[n];
+
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+
+        int[] u = new int[n - 1];
+        int[] v = new int[n - 1];
+
+        for (int i = 0; i < n - 1; i++) {
+
+            StringTokenizer st =
+                    new StringTokenizer(br.readLine());
+
+            u[i] = Integer.parseInt(st.nextToken()) - 1;
+            v[i] = Integer.parseInt(st.nextToken()) - 1;
+
+            graph[u[i]].add(v[i]);
+            graph[v[i]].add(u[i]);
+        }
+
+        // Try removing every edge
+        for (int i = 0; i < n - 1; i++) {
+
+            int a = u[i];
+            int b = v[i];
+
+            int diameter1 = getDiameter(a, a, b);
+            int diameter2 = getDiameter(b, a, b);
+
+            answer = Math.max(answer, diameter1 * diameter2);
+        }
+
+        System.out.println(answer);
+    }
+
+    /*
+     * Finds the diameter of the component containing 'start'
+     * after removing edge (blocked1, blocked2).
+     */
+    static int getDiameter(int start, int blocked1, int blocked2) {
+
+        // First DFS/BFS: find the farthest node from start
+        int farthest = bfs(start, blocked1, blocked2);
+
+        // Second BFS: distance from farthest gives diameter
+        return bfsDistance(farthest, blocked1, blocked2);
+    }
+
+    /*
+     * Returns the farthest vertex from start.
+     */
+    static int bfs(int start, int blocked1, int blocked2) {
+
+        Queue<Integer> queue = new LinkedList<>();
+
+        int[] dist = new int[n];
+        Arrays.fill(dist, -1);
+
+        queue.add(start);
+        dist[start] = 0;
+
+        int farthest = start;
+
+        while (!queue.isEmpty()) {
+
+            int current = queue.poll();
+
+            if (dist[current] > dist[farthest]) {
+                farthest = current;
+            }
+
+            for (int next : graph[current]) {
+
+                // Ignore the removed edge
+                if ((current == blocked1 && next == blocked2) ||
+                    (current == blocked2 && next == blocked1)) {
+                    continue;
+                }
+
+                if (dist[next] == -1) {
+
+                    dist[next] = dist[current] + 1;
+                    queue.add(next);
+                }
+            }
+        }
+
+        return farthest;
+    }
+
+    /*
+     * Returns the maximum distance from start
+     * inside the component.
+     */
+    static int bfsDistance(int start, int blocked1, int blocked2) {
+
+        Queue<Integer> queue = new LinkedList<>();
+
+        int[] dist = new int[n];
+        Arrays.fill(dist, -1);
+
+        queue.add(start);
+        dist[start] = 0;
+
+        int maxDistance = 0;
+
+        while (!queue.isEmpty()) {
+
+            int current = queue.poll();
+
+            maxDistance = Math.max(maxDistance, dist[current]);
+
+            for (int next : graph[current]) {
+
+                // Ignore removed edge
+                if ((current == blocked1 && next == blocked2) ||
+                    (current == blocked2 && next == blocked1)) {
+                    continue;
+                }
+
+                if (dist[next] == -1) {
+
+                    dist[next] = dist[current] + 1;
+                    queue.add(next);
+                }
+            }
+        }
+
+        return maxDistance;
+    }
+}
