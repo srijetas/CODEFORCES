@@ -1,0 +1,86 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int t = sc.nextInt();
+
+        // dp[a][b][h][m]
+        // a = previous previous y
+        // b = previous y
+        // h = number of humps
+        // m = number of valleys
+        long[][][][] dp = new long[5][5][t + 1][t + 1];
+
+        // Choose first two values
+        for (int a = 1; a <= 4; a++) {
+            for (int b = 1; b <= 4; b++) {
+                if (a != b) {
+                    dp[a][b][0][0] = 1;
+                }
+            }
+        }
+
+        // Add vertices 3...n
+        for (int pos = 3; pos <= n; pos++) {
+
+            long[][][][] next = new long[5][5][t + 1][t + 1];
+
+            for (int a = 1; a <= 4; a++) {
+                for (int b = 1; b <= 4; b++) {
+
+                    for (int h = 0; h <= t; h++) {
+                        for (int m = 0; m <= t - 1; m++) {
+
+                            long ways = dp[a][b][h][m];
+
+                            if (ways == 0)
+                                continue;
+
+                            // New value
+                            for (int c = 1; c <= 4; c++) {
+
+                                if (c == b)
+                                    continue; // horizontal segment
+
+                                int nh = h;
+                                int nm = m;
+
+                                // b is a hump
+                                if (a < b && b > c) {
+                                    nh++;
+                                }
+
+                                // b is a valley
+                                if (a > b && b < c) {
+                                    nm++;
+                                }
+
+                                if (nh <= t && nm <= t - 1) {
+                                    next[b][c][nh][nm] += ways;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            dp = next;
+        }
+
+        long answer = 0;
+
+        // Sum sequences with exactly t humps
+        // and t-1 valleys
+        for (int a = 1; a <= 4; a++) {
+            for (int b = 1; b <= 4; b++) {
+                answer += dp[a][b][t][t - 1];
+            }
+        }
+
+        System.out.println(answer);
+    }
+}
