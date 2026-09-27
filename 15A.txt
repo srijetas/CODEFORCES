@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+    static class House {
+        int x, a;
+
+        House(int x, int a) {
+            this.x = x;
+            this.a = a;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int t = sc.nextInt();
+
+        House[] houses = new House[n];
+
+        for (int i = 0; i < n; i++) {
+            int x = sc.nextInt();
+            int a = sc.nextInt();
+            houses[i] = new House(x, a);
+        }
+
+        Arrays.sort(houses, Comparator.comparingInt(h -> h.x));
+
+        int ans = 2; // One position on each outer side
+
+        for (int i = 0; i < n - 1; i++) {
+            // 2 * actual gap
+            int gap = 2 * (houses[i + 1].x - houses[i].x)
+                    - houses[i].a
+                    - houses[i + 1].a;
+
+            if (gap == 2 * t) {
+                ans += 1;
+            } else if (gap > 2 * t) {
+                ans += 2;
+            }
+        }
+
+        System.out.println(ans);
+    }
+}
