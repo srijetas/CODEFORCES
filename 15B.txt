@@ -1,0 +1,43 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int t = sc.nextInt();
+
+        while (t-- > 0) {
+
+            long n = sc.nextLong();
+            long m = sc.nextLong();
+
+            long x1 = sc.nextLong();
+            long y1 = sc.nextLong();
+
+            long x2 = sc.nextLong();
+            long y2 = sc.nextLong();
+
+            // Distance between the two lasers
+            long dx = Math.abs(x1 - x2);
+            long dy = Math.abs(y1 - y2);
+
+            // Positions where both lasers can be inside the field
+            long oneLaserPositions = (n - dx) * (m - dy);
+
+            // Common positions of the two possible sets
+            long common = Math.max(0, n - 2 * dx)
+                        * Math.max(0, m - 2 * dy);
+
+            // Cells that can be melted
+            long meltable = 2 * oneLaserPositions - common;
+
+            // Cells that cannot be melted
+            long answer = n * m - meltable;
+
+            System.out.println(answer);
+        }
+
+        sc.close();
+    }
+}
