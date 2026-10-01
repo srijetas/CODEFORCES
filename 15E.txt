@@ -1,0 +1,35 @@
+import java.io.*;
+
+public class Main {
+
+    static final long MOD = 1_000_000_009L;
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine());
+
+        long powerOf2 = 2;
+        long product = 4;
+        long s = 0;
+
+        // We process n/2 levels
+        for (int level = 2; level <= n / 2; level++) {
+
+            powerOf2 = (powerOf2 * 2) % MOD;
+
+            long factor = (powerOf2 - 3 + MOD) % MOD;
+
+            product = (product * factor) % MOD;
+
+            s = (s + product) % MOD;
+        }
+
+        long answer = (2 * s % MOD * s % MOD
+                     + 8 * s % MOD
+                     + 10) % MOD;
+
+        System.out.println(answer);
+    }
+}
