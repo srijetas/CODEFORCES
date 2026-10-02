@@ -1,0 +1,43 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+
+        char[][] flag = new char[n][m];
+
+        for (int row = 0; row < n; row++) {
+            String str = sc.next();
+            for (int col = 0; col < m; col++) {
+                flag[row][col] = str.charAt(col);
+            }
+        }
+
+        // Check every row
+        for (int row = 0; row < n; row++) {
+
+            // All cells in the row must be same
+            for (int col = 1; col < m; col++) {
+                if (flag[row][col] != flag[row][0]) {
+                    System.out.println("NO");
+                    return;
+                }
+            }
+
+            // Adjacent rows must have different colours
+            if (row > 0) {
+                if (flag[row][0] == flag[row - 1][0]) {
+                    System.out.println("NO");
+                    return;
+                }
+            }
+        }
+
+        System.out.println("YES");
+    }
+}
