@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        long a = scanner.nextLong();
+        long b = scanner.nextLong();
+        long x = scanner.nextLong();
+        long y = scanner.nextLong();
+
+        // Find GCD of x and y
+        long gcd = findGCD(x, y);
+
+        // Reduce ratio
+        x /= gcd;
+        y /= gcd;
+
+        // Maximum possible multiplier
+        long k = Math.min(a / x, b / y);
+
+        // No possible rectangle
+        if (k == 0) {
+            System.out.println("0 0");
+            return;
+        }
+
+        long answerA = x * k;
+        long answerB = y * k;
+
+        System.out.println(answerA + " " + answerB);
+    }
+
+    static long findGCD(long first, long second) {
+
+        while (second != 0) {
+            long remainder = first % second;
+            first = second;
+            second = remainder;
+        }
+
+        return first;
+    }
+}
