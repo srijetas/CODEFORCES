@@ -1,0 +1,74 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine().trim());
+
+        double[][] probability = new double[n][n];
+
+        for (int row = 0; row < n; row++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+
+            for (int column = 0; column < n; column++) {
+                probability[row][column] = Double.parseDouble(st.nextToken());
+            }
+        }
+
+        int totalMasks = 1 << n;
+
+        double[] dp = new double[totalMasks];
+
+        int fullMask = totalMasks - 1;
+        dp[fullMask] = 1.0;
+
+        for (int mask = fullMask; mask > 0; mask--) {
+
+            int fishCount = Integer.bitCount(mask);
+
+            if (fishCount <= 1 || dp[mask] == 0.0) {
+                continue;
+            }
+
+            double pairProbability =
+                    1.0 / (fishCount * (fishCount - 1) / 2.0);
+
+            for (int firstFish = 0; firstFish < n; firstFish++) {
+
+                if ((mask & (1 << firstFish)) == 0) {
+                    continue;
+                }
+
+                for (int secondFish = 0; secondFish < n; secondFish++) {
+
+                    if (firstFish == secondFish) {
+                        continue;
+                    }
+
+                    if ((mask & (1 << secondFish)) == 0) {
+                        continue;
+                    }
+
+                    // firstFish eats secondFish
+                    int nextMask = mask & ~(1 << secondFish);
+
+                    dp[nextMask] +=
+                            dp[mask]
+                            * pairProbability
+                            * probability[firstFish][secondFish];
+                }
+            }
+        }
+
+        for (int fish = 0; fish < n; fish++) {
+            int mask = 1 << fish;
+
+            System.out.printf("%.6f ", dp[mask]);
+        }
+
+        System.out.println();
+    }
+}
