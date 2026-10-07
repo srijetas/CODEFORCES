@@ -1,0 +1,59 @@
+import java.util.*;
+
+public class Main {
+
+    static boolean isPrime(int number) {
+        if (number < 2) {
+            return false;
+        }
+
+        for (int divisor = 2; divisor * divisor <= number; divisor++) {
+            if (number % divisor == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int n = scanner.nextInt();
+        int k = scanner.nextInt();
+
+        List<Integer> primes = new ArrayList<>();
+
+        // Store all prime numbers from 2 to n
+        for (int number = 2; number <= n; number++) {
+            if (isPrime(number)) {
+                primes.add(number);
+            }
+        }
+
+        int count = 0;
+
+        // Check neighboring primes
+        for (int position = 0; position + 1 < primes.size(); position++) {
+            int candidate = primes.get(position)
+                           + primes.get(position + 1)
+                           + 1;
+
+            if (candidate > n) {
+                break;
+            }
+
+            if (isPrime(candidate)) {
+                count++;
+            }
+        }
+
+        if (count >= k) {
+            System.out.println("YES");
+        } else {
+            System.out.println("NO");
+        }
+
+        scanner.close();
+    }
+}
