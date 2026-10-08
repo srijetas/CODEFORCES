@@ -1,0 +1,72 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        int[] qualification = new int[n];
+
+        int root = 0;
+
+        for (int i = 0; i < n; i++) {
+            qualification[i] = sc.nextInt();
+
+            if (qualification[i] > qualification[root]) {
+                root = i;
+            }
+        }
+
+        // Check whether maximum qualification is unique
+        int maxQualification = qualification[root];
+        int maxCount = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (qualification[i] == maxQualification) {
+                maxCount++;
+            }
+        }
+
+        if (maxCount > 1) {
+            System.out.println(-1);
+            return;
+        }
+
+        int m = sc.nextInt();
+
+        long[] minCost = new long[n];
+
+        Arrays.fill(minCost, Long.MAX_VALUE);
+
+        for (int i = 0; i < m; i++) {
+            int a = sc.nextInt() - 1;
+            int b = sc.nextInt() - 1;
+            long c = sc.nextLong();
+
+            // b needs a supervisor.
+            minCost[b] = Math.min(minCost[b], c);
+        }
+
+        long answer = 0;
+
+        for (int i = 0; i < n; i++) {
+
+            // Root does not need a supervisor
+            if (i == root) {
+                continue;
+            }
+
+            // No possible supervisor
+            if (minCost[i] == Long.MAX_VALUE) {
+                System.out.println(-1);
+                return;
+            }
+
+            answer += minCost[i];
+        }
+
+        System.out.println(answer);
+    }
+}
