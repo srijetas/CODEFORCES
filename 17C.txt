@@ -1,0 +1,129 @@
+import java.util.Scanner;
+
+public class Main {
+
+static final int MOD = 51123987;
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    String s = sc.next();
+    StringBuilder compressed = new StringBuilder();
+    for (int pos = 0; pos < n; pos++) {
+        if (pos == 0 || s.charAt(pos) != s.charAt(pos - 1)) {
+            compressed.append(s.charAt(pos));
+        }
+    }
+    String r = compressed.toString();
+    int m = r.length();
+    int limit = (n + 2) / 3;
+    int[][] nextPos = new int[m][3];
+    for (int index = 0; index < m; index++) {
+        for (int ch = 0; ch < 3; ch++) {
+            nextPos[index][ch] = -1;
+            for (int nextIndex = index + 1;
+                 nextIndex < m;
+                 nextIndex++) {
+                if (r.charAt(nextIndex) == (char) ('a' + ch)) {
+                    nextPos[index][ch] = nextIndex;
+                    break;
+                }
+            }
+        }
+    }
+    int[][][] dp = new int[m][limit + 1][limit + 1];
+    for (int ch = 0; ch < 3; ch++) {
+        int firstIndex = -1;
+        for (int index = 0; index < m; index++) {
+            if (r.charAt(index) == (char) ('a' + ch)) {
+                firstIndex = index;
+                break;
+            }
+        }
+        if (firstIndex == -1) {
+            continue;
+        }
+        int aCount = (ch == 0) ? 1 : 0;
+        int bCount = (ch == 1) ? 1 : 0;
+        dp[firstIndex][aCount][bCount] = 1;
+    }
+    for (int length = 1; length < n; length++) {
+        int[][][] nextDP =
+                new int[m][limit + 1][limit + 1];
+        for (int index = 0; index < m; index++) {
+            char lastChar = r.charAt(index);
+            for (int aCount = 0;
+                 aCount <= limit;
+                 aCount++) {
+                for (int bCount = 0;
+                     bCount <= limit;
+                     bCount++) {
+                    int cCount = length - aCount - bCount;
+                    if (cCount < 0 || cCount > limit) {
+                        continue;
+                    }
+                    int ways = dp[index][aCount][bCount];
+                    if (ways == 0) {
+                        continue;
+                    }
+                    for (int ch = 0; ch < 3; ch++) {
+                        int newA =
+                                aCount + (ch == 0 ? 1 : 0);
+                        int newB =
+                                bCount + (ch == 1 ? 1 : 0);
+                        int newC =
+                                cCount + (ch == 2 ? 1 : 0);
+                        if (newA > limit ||
+                            newB > limit ||
+                            newC > limit) {
+                            continue;
+                        }
+                        int newIndex;
+                        if (lastChar == (char) ('a' + ch)) {
+                            newIndex = index;
+                        } else {
+                            newIndex = nextPos[index][ch];
+                        }
+                        if (newIndex == -1) {
+                            continue;
+                        }
+                        nextDP[newIndex][newA][newB] =
+                                (nextDP[newIndex][newA][newB]
+                                        + ways) % MOD;
+                    }
+                }
+            }
+        }
+        dp = nextDP;
+    }
+    int answer = 0;
+    for (int index = 0; index < m; index++) {
+        for (int aCount = 0;
+             aCount <= limit;
+             aCount++) {
+            for (int bCount = 0;
+                 bCount <= limit;
+                 bCount++) {
+                int cCount = n - aCount - bCount;
+                if (cCount < 0 || cCount > limit) {
+                    continue;
+                }
+                int maxFrequency = Math.max(
+                        aCount,
+                        Math.max(bCount, cCount)
+                );
+                int minFrequency = Math.min(
+                        aCount,
+                        Math.min(bCount, cCount)
+                );
+                if (maxFrequency - minFrequency <= 1) {
+                    answer = (answer
+                            + dp[index][aCount][bCount]) % MOD;
+                }
+            }
+        }
+    }
+    System.out.println(answer);
+    sc.close();
+}
+
+}
