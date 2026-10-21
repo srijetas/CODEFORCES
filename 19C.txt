@@ -1,0 +1,142 @@
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    static final long MOD1 = 1_000_000_007L;
+    static final long MOD2 = 1_000_000_009L;
+    static final long BASE1 = 911382323L;
+    static final long BASE2 = 972663749L;
+
+    static class RollingHash {
+        long[] h1, h2, p1, p2;
+        int n;
+
+        RollingHash(int[] a) {
+            n = a.length;
+            h1 = new long[n + 1];
+            h2 = new long[n + 1];
+            p1 = new long[n + 1];
+            p2 = new long[n + 1];
+
+            p1[0] = p2[0] = 1;
+
+            for (int i = 0; i < n; i++) {
+                long v = (long) a[i] + 1;
+
+                h1[i + 1] = (h1[i] * BASE1 + v) % MOD1;
+                h2[i + 1] = (h2[i] * BASE2 + v) % MOD2;
+
+                p1[i + 1] = p1[i] * BASE1 % MOD1;
+                p2[i + 1] = p2[i] * BASE2 % MOD2;
+            }
+        }
+
+        long get1(int l, int len) {
+            return (h1[l + len] - h1[l] * p1[len] % MOD1
+                    + MOD1) % MOD1;
+        }
+
+        long get2(int l, int len) {
+            return (h2[l + len] - h2[l] * p2[len] % MOD2
+                    + MOD2) % MOD2;
+        }
+
+        boolean equal(int l1, int l2, int len) {
+            return get1(l1, len) == get1(l2, len)
+                    && get2(l1, len) == get2(l2, len);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine().trim());
+        int[] a = new int[n];
+
+        StringTokenizer st = new StringTokenizer("");
+        while (!st.hasMoreTokens()) {
+            st = new StringTokenizer(br.readLine());
+        }
+
+        for (int i = 0; i < n; i++) {
+            while (!st.hasMoreTokens()) {
+                st = new StringTokenizer(br.readLine());
+            }
+            a[i] = Integer.parseInt(st.nextToken());
+        }
+
+        // Store the positions of every value.
+        Map<Integer, ArrayList<Integer>> positions = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            positions.computeIfAbsent(a[i], k -> new ArrayList<>())
+                     .add(i);
+        }
+
+        RollingHash rh = new RollingHash(a);
+
+        final int INF = n + 1;
+        int[] bestAt = new int[n];
+        Arrays.fill(bestAt, INF);
+
+        // Find the shortest repeat starting at each position.
+        for (int i = 0; i < n; i++) {
+            ArrayList<Integer> list = positions.get(a[i]);
+
+            for (int j : list) {
+                if (j <= i) continue;
+
+                int x = j - i;
+
+                // The repeat must fit inside the array.
+                if (i + 2 * x > n) break;
+
+                // Compare [i, i+x) with [i+x, i+2*x).
+                if (rh.equal(i, i + x, x)) {
+                    bestAt[i] = x;
+                    break;
+                }
+            }
+        }
+
+        // suffixBest[i] gives the shortest repeat starting
+        // at or after i; ties go to the leftmost start.
+        int[] suffixBest = new int[n + 1];
+        suffixBest[n] = -1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            int next = suffixBest[i + 1];
+
+            if (bestAt[i] != INF &&
+                    (next == -1 || bestAt[i] <= bestAt[next])) {
+                suffixBest[i] = i;
+            } else {
+                suffixBest[i] = next;
+            }
+        }
+
+        // Simulate Bob's deletions.
+        int start = 0;
+
+        while (start < n) {
+            int i = suffixBest[start];
+
+            if (i == -1) break;
+
+            // Delete everything through the left half.
+            start = i + bestAt[i];
+        }
+
+        StringBuilder out = new StringBuilder();
+        out.append(n - start).append('\n');
+
+        for (int i = start; i < n; i++) {
+            out.append(a[i]).append(' ');
+        }
+
+        out.append('\n');
+        System.out.print(out);
+    }
+}
