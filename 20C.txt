@@ -1,0 +1,67 @@
+import java.util.*;
+
+public class Main {
+static class Edge {
+int node;
+long weight;
+
+    Edge(int node, long weight) {
+        this.node = node;
+        this.weight = weight;
+    }
+}
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    int m = sc.nextInt();
+    List<List<Edge>> graph = new ArrayList<>();
+    for (int row = 0; row <= n; row++) {
+        graph.add(new ArrayList<>());
+    }
+    for (int edge = 0; edge < m; edge++) {
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        long w = sc.nextLong();
+        graph.get(a).add(new Edge(b, w));
+        graph.get(b).add(new Edge(a, w));
+    }
+    long[] dist = new long[n + 1];
+    int[] parent = new int[n + 1];
+    Arrays.fill(dist, Long.MAX_VALUE);
+    dist[1] = 0;
+    PriorityQueue<Edge> pq = new PriorityQueue<>(
+        (a, b) -> Long.compare(a.weight, b.weight)
+    );
+    pq.add(new Edge(1, 0));
+    while (!pq.isEmpty()) {
+        Edge current = pq.poll();
+        int node = current.node;
+        long distance = current.weight;
+        if (distance != dist[node]) {
+            continue;
+        }
+        for (Edge next : graph.get(node)) {
+            long newDistance = distance + next.weight;
+            if (newDistance < dist[next.node]) {
+                dist[next.node] = newDistance;
+                parent[next.node] = node;
+                pq.add(new Edge(next.node, newDistance));
+            }
+        }
+    }
+    if (dist[n] == Long.MAX_VALUE) {
+        System.out.println(-1);
+        return;
+    }
+    List<Integer> path = new ArrayList<>();
+    for (int node = n; node != 0; node = parent[node]) {
+        path.add(node);
+    }
+    Collections.reverse(path);
+    for (int node : path) {
+        System.out.print(node + " ");
+    }
+    System.out.println();
+}
+
+}
