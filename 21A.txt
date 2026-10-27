@@ -1,0 +1,49 @@
+import java.util.Scanner;
+
+public class Main {
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+String s = sc.nextLine();
+
+    String[] parts = s.split("@", -1);
+    if (parts.length != 2) {
+        System.out.println("NO");
+        return;
+    }
+    String username = parts[0];
+    String rest = parts[1];
+    if (username.length() < 1 || username.length() > 16 ||
+        !username.matches("[a-zA-Z0-9_]+")) {
+        System.out.println("NO");
+        return;
+    }
+    String[] hostResource = rest.split("/", -1);
+    if (hostResource.length > 2) {
+        System.out.println("NO");
+        return;
+    }
+    String hostname = hostResource[0];
+    if (hostname.length() < 1 || hostname.length() > 32) {
+        System.out.println("NO");
+        return;
+    }
+    String[] words = hostname.split("\\.", -1);
+    for (String word : words) {
+        if (word.length() < 1 || word.length() > 16 ||
+            !word.matches("[a-zA-Z0-9_]+")) {
+            System.out.println("NO");
+            return;
+        }
+    }
+    if (hostResource.length == 2) {
+        String resource = hostResource[1];
+        if (resource.length() < 1 || resource.length() > 16 ||
+            !resource.matches("[a-zA-Z0-9_]+")) {
+            System.out.println("NO");
+            return;
+        }
+    }
+    System.out.println("YES");
+}
+
+}
