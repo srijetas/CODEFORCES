@@ -1,0 +1,41 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+        int[] arr = new int[n];
+
+        long total = 0;
+
+        for (int row = 0; row < n; row++) {
+            arr[row] = sc.nextInt();
+            total += arr[row];
+        }
+
+        if (total % 3 != 0) {
+            System.out.println(0);
+            return;
+        }
+
+        long target = total / 3;
+        long prefixSum = 0;
+        long countFirst = 0;
+        long answer = 0;
+
+        for (int row = 0; row < n - 1; row++) {
+            prefixSum += arr[row];
+
+            if (prefixSum == 2 * target) {
+                answer += countFirst;
+            }
+
+            if (prefixSum == target) {
+                countFirst++;
+            }
+        }
+
+        System.out.println(answer);
+    }
+}
