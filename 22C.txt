@@ -1,0 +1,41 @@
+import java.util.*;
+
+public class Main {
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+
+    int n = sc.nextInt();
+    int m = sc.nextInt();
+    int v = sc.nextInt();
+    long max = (n - 1) + (long)(n - 2) * (n - 3) / 2;
+    if (m < n - 1 || m > max) {
+        System.out.println(-1);
+        return;
+    }
+    StringBuilder sb = new StringBuilder();
+    // Connect v to every other vertex
+    for (int row = 1; row <= n; row++) {
+        if (row != v) {
+            sb.append(v).append(" ").append(row).append("\n");
+        }
+    }
+    // Choose one vertex to exclude
+    int excluded = (v == 1) ? 2 : 1;
+    int remaining = m - (n - 1);
+    // Add extra edges among remaining vertices
+    for (int row = 1; row <= n && remaining > 0; row++) {
+        if (row == v || row == excluded) {
+            continue;
+        }
+        for (int col = row + 1; col <= n && remaining > 0; col++) {
+            if (col == v || col == excluded) {
+                continue;
+            }
+            sb.append(row).append(" ").append(col).append("\n");
+            remaining--;
+        }
+    }
+    System.out.print(sb);
+}
+
+}
