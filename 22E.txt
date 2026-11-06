@@ -1,0 +1,96 @@
+import java.util.*;
+
+public class Main {
+
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    int[] f = new int[n + 1];
+    int[] indegree = new int[n + 1];
+    ArrayList<Integer>[] rev = new ArrayList[n + 1];
+    for (int i = 1; i <= n; i++) {
+        rev[i] = new ArrayList<>();
+    }
+    for (int i = 1; i <= n; i++) {
+        f[i] = sc.nextInt();
+        indegree[f[i]]++;
+        rev[f[i]].add(i);
+    }
+    int[] degree = indegree.clone();
+    Queue<Integer> q = new LinkedList<>();
+    for (int i = 1; i <= n; i++) {
+        if (degree[i] == 0) {
+            q.add(i);
+        }
+    }
+    while (!q.isEmpty()) {
+        int u = q.poll();
+        degree[f[u]]--;
+        if (degree[f[u]] == 0) {
+            q.add(f[u]);
+        }
+    }
+    int[] comp = new int[n + 1];
+    ArrayList<Integer> sinks = new ArrayList<>();
+    int id = 0;
+    for (int i = 1; i <= n; i++) {
+        if (degree[i] > 0 && comp[i] == 0) {
+            id++;
+            sinks.add(i);
+            Stack<Integer> st = new Stack<>();
+            st.push(i);
+            comp[i] = id;
+            while (!st.isEmpty()) {
+                int u = st.pop();
+                for (int v : rev[u]) {
+                    if (comp[v] == 0) {
+                        comp[v] = id;
+                        st.push(v);
+                    }
+                }
+            }
+        }
+    }
+    int c = sinks.size();
+    if (c == 1 && indegreeHasNoZero(indegree, n)) {
+        System.out.println(0);
+        return;
+    }
+    int[] entry = new int[c + 1];
+    ArrayList<Integer> extra = new ArrayList<>();
+    for (int i = 1; i <= n; i++) {
+        if (indegree[i] == 0) {
+            int x = comp[i];
+            if (entry[x] == 0) {
+                entry[x] = i;
+            } else {
+                extra.add(i);
+            }
+        }
+    }
+    for (int i = 1; i <= c; i++) {
+        if (entry[i] == 0) {
+            entry[i] = sinks.get(i - 1);
+        }
+    }
+    int ans = c + extra.size();
+    System.out.println(ans);
+    for (int i = 0; i < c; i++) {
+        int from = sinks.get(i);
+        int to = entry[(i + 1) % c + 1];
+        System.out.println(from + " " + to);
+    }
+    for (int x : extra) {
+        System.out.println(sinks.get(0) + " " + x);
+    }
+}
+static boolean indegreeHasNoZero(int[] indegree, int n) {
+    for (int i = 1; i <= n; i++) {
+        if (indegree[i] == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+}
