@@ -1,0 +1,30 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String s = sc.next();
+
+        int n = s.length();
+        int ans = 0;
+
+        for (int len = 1; len < n; len++) {
+
+            for (int start1 = 0; start1 + len <= n; start1++) {
+
+                String sub1 = s.substring(start1, start1 + len);
+
+                for (int start2 = start1 + 1; start2 + len <= n; start2++) {
+
+                    String sub2 = s.substring(start2, start2 + len);
+
+                    if (sub1.equals(sub2)) {
+                        ans = Math.max(ans, len);
+                    }
+                }
+            }
+        }
+
+        System.out.println(ans);
+    }
+}
