@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+
+static class Box {
+    long a, o;
+    int id;
+    Box(long a, long o, int id) {
+        this.a = a;
+        this.o = o;
+        this.id = id;
+    }
+}
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int t = sc.nextInt();
+    while (t-- > 0) {
+        int n = sc.nextInt();
+        Box[] boxes = new Box[2 * n - 1];
+        for (int index = 0; index < 2 * n - 1; index++) {
+            long a = sc.nextLong();
+            long o = sc.nextLong();
+            boxes[index] = new Box(a, o, index + 1);
+        }
+        Arrays.sort(boxes, (x, y) ->
+            Long.compare(x.a, y.a)
+        );
+        ArrayList<Integer> answer = new ArrayList<>();
+        for (int index = 0; index < 2 * n - 2; index += 2) {
+            if (boxes[index].o >= boxes[index + 1].o) {
+                answer.add(boxes[index].id);
+            } else {
+                answer.add(boxes[index + 1].id);
+            }
+        }
+        answer.add(boxes[2 * n - 2].id);
+        System.out.println("YES");
+        for (int id : answer) {
+            System.out.print(id + " ");
+        }
+        System.out.println();
+    }
+    sc.close();
+}
+
+}
