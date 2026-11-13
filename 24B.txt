@@ -1,0 +1,62 @@
+import java.util.*;
+
+public class Main {
+
+static int[] points = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+static class Driver {
+    String name;
+    int totalPoints = 0;
+    int[] positions = new int[51];
+    Driver(String name) {
+        this.name = name;
+    }
+}
+static boolean better(Driver a, Driver b, boolean original) {
+    if (original) {
+        if (a.totalPoints != b.totalPoints)
+            return a.totalPoints > b.totalPoints;
+        for (int pos = 1; pos <= 50; pos++) {
+            if (a.positions[pos] != b.positions[pos])
+                return a.positions[pos] > b.positions[pos];
+        }
+    } else {
+        if (a.positions[1] != b.positions[1])
+            return a.positions[1] > b.positions[1];
+        if (a.totalPoints != b.totalPoints)
+            return a.totalPoints > b.totalPoints;
+        for (int pos = 2; pos <= 50; pos++) {
+            if (a.positions[pos] != b.positions[pos])
+                return a.positions[pos] > b.positions[pos];
+        }
+    }
+    return false;
+}
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int t = sc.nextInt();
+    HashMap<String, Driver> map = new HashMap<>();
+    while (t-- > 0) {
+        int n = sc.nextInt();
+        for (int pos = 1; pos <= n; pos++) {
+            String name = sc.next();
+            Driver d = map.getOrDefault(name, new Driver(name));
+            d.positions[pos]++;
+            if (pos <= 10)
+                d.totalPoints += points[pos - 1];
+            map.put(name, d);
+        }
+    }
+    ArrayList<Driver> drivers = new ArrayList<>(map.values());
+    Driver original = drivers.get(0);
+    Driver alternative = drivers.get(0);
+    for (Driver d : drivers) {
+        if (better(d, original, true))
+            original = d;
+        if (better(d, alternative, false))
+            alternative = d;
+    }
+    System.out.println(original.name);
+    System.out.println(alternative.name);
+}
+
+}
