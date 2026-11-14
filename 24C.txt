@@ -1,0 +1,43 @@
+import java.util.*;
+
+public class Main {
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+
+    int n = sc.nextInt();
+    long j = sc.nextLong();
+    long x = sc.nextLong();
+    long y = sc.nextLong();
+    long[] a = new long[n];
+    long[] b = new long[n];
+    for (int i = 0; i < n; i++) {
+        a[i] = sc.nextLong();
+        b[i] = sc.nextLong();
+    }
+    long sx = 0;
+    long sy = 0;
+    for (int i = 0; i < n; i++) {
+        if (i % 2 == 0) {
+            sx += a[i];
+            sy += b[i];
+        } else {
+            sx -= a[i];
+            sy -= b[i];
+        }
+    }
+    long q = j / n;
+    int r = (int)(j % n);
+    // If number of complete cycles is odd
+    if (q % 2 == 1) {
+        x = 2 * sx - x;
+        y = 2 * sy - y;
+    }
+    // Remaining operations
+    for (int i = 0; i < r; i++) {
+        x = 2 * a[i] - x;
+        y = 2 * b[i] - y;
+    }
+    System.out.println(x + " " + y);
+}
+
+}
