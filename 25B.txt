@@ -1,0 +1,24 @@
+import java.util.Scanner;
+
+public class Main {
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+
+    int n = sc.nextInt();
+    String s = sc.next();
+    if (n % 2 == 0) {
+        for (int i = 0; i < n; i += 2) {
+            if (i > 0) System.out.print("-");
+            System.out.print(s.substring(i, i + 2));
+        }
+    } else {
+        for (int i = 0; i < n - 3; i += 2) {
+            if (i > 0) System.out.print("-");
+            System.out.print(s.substring(i, i + 2));
+        }
+        if (n > 3) System.out.print("-");
+        System.out.print(s.substring(n - 3));
+    }
+}
+
+}
