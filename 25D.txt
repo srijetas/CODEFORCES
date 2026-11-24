@@ -1,0 +1,64 @@
+import java.util.*;
+
+public class Main {
+
+static int[] parent;
+static int[] size;
+static int find(int x) {
+    if (parent[x] != x) {
+        parent[x] = find(parent[x]);
+    }
+    return parent[x];
+}
+static boolean union(int a, int b) {
+    int rootA = find(a);
+    int rootB = find(b);
+    if (rootA == rootB) {
+        return false;
+    }
+    if (size[rootA] < size[rootB]) {
+        int temp = rootA;
+        rootA = rootB;
+        rootB = temp;
+    }
+    parent[rootB] = rootA;
+    size[rootA] += size[rootB];
+    return true;
+}
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    parent = new int[n + 1];
+    size = new int[n + 1];
+    for (int i = 1; i <= n; i++) {
+        parent[i] = i;
+        size[i] = 1;
+    }
+    ArrayList<int[]> removed = new ArrayList<>();
+    for (int i = 0; i < n - 1; i++) {
+        int u = sc.nextInt();
+        int v = sc.nextInt();
+        if (!union(u, v)) {
+            removed.add(new int[]{u, v});
+        }
+    }
+    ArrayList<Integer> components = new ArrayList<>();
+    for (int i = 1; i <= n; i++) {
+        if (find(i) == i) {
+            components.add(i);
+        }
+    }
+    int k = components.size();
+    System.out.println(k - 1);
+    for (int i = 0; i < k - 1; i++) {
+        int[] edge = removed.get(i);
+        System.out.println(
+            edge[0] + " " + edge[1] + " " +
+            components.get(i) + " " +
+            components.get(i + 1)
+        );
+    }
+    sc.close();
+}
+
+}
