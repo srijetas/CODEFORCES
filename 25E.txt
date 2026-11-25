@@ -1,0 +1,71 @@
+import java.util.*;
+
+public class Main {
+
+static int[] prefixFunction(String s) {
+    int n = s.length();
+    int[] pi = new int[n];
+    for (int i = 1; i < n; i++) {
+        int j = pi[i - 1];
+        while (j > 0 && s.charAt(i) != s.charAt(j)) {
+            j = pi[j - 1];
+        }
+        if (s.charAt(i) == s.charAt(j)) {
+            j++;
+        }
+        pi[i] = j;
+    }
+    return pi;
+}
+static String merge(String a, String b) {
+    int[] pi = prefixFunction(b);
+    int j = 0;
+    boolean found = false;
+    for (int i = 0; i < a.length(); i++) {
+        while (j > 0 &&
+              (j == b.length() ||
+               a.charAt(i) != b.charAt(j))) {
+            j = pi[j - 1];
+        }
+        if (j < b.length() &&
+            a.charAt(i) == b.charAt(j)) {
+            j++;
+        }
+        if (j == b.length()) {
+            found = true;
+            j = pi[j - 1];
+        }
+    }
+    if (found) {
+        return a;
+    }
+    return a + b.substring(j);
+}
+static int solve(String[] s) {
+    int ans = Integer.MAX_VALUE;
+    int[][] permutations = {
+        {0, 1, 2},
+        {0, 2, 1},
+        {1, 0, 2},
+        {1, 2, 0},
+        {2, 0, 1},
+        {2, 1, 0}
+    };
+    for (int[] p : permutations) {
+        String result = s[p[0]];
+        result = merge(result, s[p[1]]);
+        result = merge(result, s[p[2]]);
+        ans = Math.min(ans, result.length());
+    }
+    return ans;
+}
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    String[] s = new String[3];
+    for (int i = 0; i < 3; i++) {
+        s[i] = sc.next();
+    }
+    System.out.println(solve(s));
+}
+
+}
